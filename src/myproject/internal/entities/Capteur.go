@@ -3,7 +3,7 @@ package entities
 type Capteur struct {
 	Id   int
 	IATA string
-	Type int
+	Type string
 }
 
 func (c *Capteur) getValue() int {
