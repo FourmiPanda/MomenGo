@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"myproject/internal/entities"
 	"os"
 	"path/filepath"
@@ -16,12 +17,14 @@ func main() {
 	conf := getConfig()
 	client := connect(conf.Broker.Url+":"+conf.Broker.Port, "capteurs")
 
-	fmt.Println("[PUBLISHER]: Publishing ...")
+	fmt.Println("Connected !")
 	for {
+		fmt.Println("[CAPTEURS] : Sending data ...")
 		for _, v := range conf.Capteurs {
-			fmt.Println(v)
+			client.Publish("capteurs/"+v.IATA+"/"+v.Type, 0, false, rand.Intn(100))
 		}
-		client.Publish("capteurs/", 0, false, "hello")
+		duration := time.Duration(10) * time.Second
+		time.Sleep(duration)
 	}
 
 }
@@ -50,7 +53,7 @@ func connect(brokerURI string, clientId string) mqtt.Client {
 	for !token.WaitTimeout(3 * time.Second) {
 	}
 	if err := token.Error(); err != nil {
-		log.Fatal(err)
+		handleError(err)
 	}
 	return client
 }
@@ -67,6 +70,5 @@ func createClientOptions(brokerURI string, clientId string) *mqtt.ClientOptions 
 }
 
 func handleError(err error) {
-	fmt.Println(err)
-	os.Exit(1)
+	log.Fatal(err)
 }
