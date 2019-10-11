@@ -1,7 +1,7 @@
 {
   "Broker": {
     "Url": "localhost",
-    "Port": 1883
+    "Port": "1883"
   },
   "Capteurs": [
     {

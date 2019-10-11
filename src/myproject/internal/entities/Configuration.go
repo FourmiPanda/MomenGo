@@ -7,5 +7,5 @@ type Configuration struct {
 
 type Broker struct {
 	Url  string
-	Port int
+	Port string
 }
