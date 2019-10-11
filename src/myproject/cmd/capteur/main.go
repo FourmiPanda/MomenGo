@@ -22,7 +22,8 @@ func main() {
 	for {
 		fmt.Println("[CAPTEURS] : Sending data ...")
 		for _, v := range conf.Capteurs {
-			client.Publish("/capteurs/"+v.IATA+"/"+v.Type, 0, false, strconv.Itoa(rand.Intn(100)))
+			client.Publish("/capteurs/"+v.IATA+"/"+v.Type, 0, false,
+				"{\"timestamp\" : "+time.Now().String()+", \"value\": "+strconv.Itoa(rand.Intn(100))+" }")
 		}
 		duration := time.Duration(10) * time.Second
 		time.Sleep(duration)
