@@ -1,0 +1,18 @@
+{
+  "Broker": {
+    "Url": "localhost",
+    "Port": 1883
+  },
+  "Capteurs": [
+    {
+      "Id": 1,
+      "IATA": "AAA",
+      "Type": 0
+    },
+    {
+      "Id": 2,
+      "IATA": "BBB",
+      "Type": 1
+    }
+  ]
+}
