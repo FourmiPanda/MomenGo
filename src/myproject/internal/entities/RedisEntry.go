@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+	"time"
 )
 
 /*
@@ -26,6 +27,27 @@ type RedisEntry struct {
 	Value		float64
 	Timestamp  	string
 }
+type RedisCaptorValue struct {
+	Value		float64
+	Timestamp  	time.Time
+}
+
+func (r *RedisCaptorValue) getRedisCaptorToJson () string {
+	return  `{` +
+			`"value":` 		+ r.getValueToString() 		+ `,` 	+
+			`"timestamp":"` + r.getTimestampToString() 	+ `"` 	+
+		`}`
+}
+
+func (r *RedisCaptorValue) getValueToString () string {
+	return  strconv.FormatFloat(r.Value, 'E', -1, 64)
+}
+
+func (r *RedisCaptorValue) getTimestampToString () string {
+	return r.Timestamp.String()
+}
+
+
 
 func CreateARedisEntry(jsonEntry []byte) *RedisEntry{
 	var e RedisEntry
