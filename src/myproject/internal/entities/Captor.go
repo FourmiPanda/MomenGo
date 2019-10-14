@@ -10,7 +10,7 @@ type Captor struct {
 	IdCaptor 	int
 	IdAirport 	string
 	Measure		string
-	Values 		[]CaptorValue
+	Values 		[]*CaptorValue
 }
 
 
