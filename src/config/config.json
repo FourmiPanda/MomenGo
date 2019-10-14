@@ -1,0 +1,20 @@
+{
+  "Broker": {
+    "Url": "localhost",
+    "Port": "1883"
+  },
+  "Capteurs": [
+    {
+      "Id": 1,
+      "IATA": "AAA",
+      "Type": "temperature",
+      "QoS": 0
+    },
+    {
+      "Id": 2,
+      "IATA": "BBB",
+      "Type": "atmospheric_pressure",
+      "QoS": 0
+    }
+  ]
+}

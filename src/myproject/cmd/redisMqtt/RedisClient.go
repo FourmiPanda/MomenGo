@@ -1,22 +1,22 @@
 package redisMqtt
 
 import (
-	"MomenGo/src/myproject/internal/entities"
 	"github.com/gomodule/redigo/redis"
 	"log"
+	"myproject/internal/entities"
 )
 
 type RedisClient struct {
-	network 	string
-	address 	string
-	conn 	redis.Conn
+	network string
+	address string
+	conn    redis.Conn
 }
 
 func CreateARedisClient(network string, address string) RedisClient {
 	return RedisClient{network: network, address: address, conn: nil}
 }
 
-func (c *RedisClient) connectionToServer() redis.Conn{
+func (c *RedisClient) connectionToServer() redis.Conn {
 	// Connect to the Redis server (default port is 6379)
 	// conn, err := redis.Dial("tcp", "localhost:6379")
 	var err error
@@ -29,7 +29,8 @@ func (c *RedisClient) connectionToServer() redis.Conn{
 	return c.conn
 }
 
-func (c *RedisClient) CreateAnEntry(entry *entities.RedisEntry) *redis.Conn{c.connectionToServer()
+func (c *RedisClient) CreateAnEntry(entry *entities.RedisEntry) *redis.Conn {
+	c.connectionToServer()
 	_, err := c.connectionToServer().Do("RPUSH", "captor", entry.RedisEntryTOString())
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +40,7 @@ func (c *RedisClient) CreateAnEntry(entry *entities.RedisEntry) *redis.Conn{c.co
 	return &c.conn
 }
 
-func (c *RedisClient) GetAnEntry(entry string) string{
+func (c *RedisClient) GetAnEntry(entry string) string {
 	r, err := redis.String(c.conn.Do("GET", entry))
 	if err != nil {
 		log.Fatal(err)
@@ -48,6 +49,6 @@ func (c *RedisClient) GetAnEntry(entry string) string{
 	return r
 }
 
-func main()  {
+func main() {
 
 }
