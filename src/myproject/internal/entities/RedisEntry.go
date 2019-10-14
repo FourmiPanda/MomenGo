@@ -35,6 +35,9 @@ func CreateARedisEntry(jsonEntry []byte) *RedisEntry{
 func (r *RedisEntry) RedisEntryToJson () []byte{
 	return r.Captor.CaptorToJson()
 }
+func (r *RedisEntry) RedisEntryToString () string{
+	return r.Captor.CaptorToString()
+}
 
 func (r *RedisEntry) PrintAll() {
 	println(r.Captor.CaptorToString())
