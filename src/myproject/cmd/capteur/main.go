@@ -19,8 +19,7 @@ func main() {
 
 	for {
 		for _, v := range conf.Capteurs {
-
-			fmt.Println("[CAPTEURS] : Publishing data")
+			fmt.Println("[CAPTEUR-" + strconv.Itoa(v.Id) + "] : Publishing data for airport " + v.IATA)
 			client.Publish("/capteurs/"+v.IATA+"/"+v.Type, byte(v.QoS), false,
 				"{\"timestamp\" : \""+time.Now().Format("2006-01-02-15-04-05")+"\", \"value\": "+strconv.Itoa(v.GetValue())+" }")
 		}
