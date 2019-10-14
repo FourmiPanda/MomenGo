@@ -17,12 +17,18 @@ Une seule value dans values pour les messages MQTT
 ```
 */
 type MqttMessage struct {
-	Captor Captor
+	Captor *Captor
 }
 
-func CreateAMqttMessage(jsonEntry []byte) *MqttMessage{
+func CreateAMqttMessage(captor *Captor) *MqttMessage{
 	c := MqttMessage{
-		Captor: *CreateACaptor(jsonEntry),
+		Captor: captor,
+	}
+	return &c
+}
+func CreateAMqttMessageFromByte(json []byte) *MqttMessage{
+	c := MqttMessage{
+		Captor: CreateACaptor(json),
 	}
 	return &c
 }

@@ -12,8 +12,8 @@ type CaptorValue struct {
 
 func (r *CaptorValue) GetCaptorValueToString () string {
 	return  `{` +
-		`"value":` 		+ r.GetValueToString() 		+ `,` 	+
-		`"timestamp":"` + r.GetTimestampToString() 	+ `"` 	+
+			`"value":` 		+ r.GetValueToString() 		+ `,` 	+
+			`"timestamp":"` + r.GetTimestampToString() 	+ `"` 	+
 		`}`
 }
 
