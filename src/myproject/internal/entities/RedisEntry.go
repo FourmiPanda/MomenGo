@@ -1,12 +1,5 @@
 package entities
 
-import (
-	"encoding/json"
-	"log"
-	"strconv"
-	"time"
-)
-
 /*
 ## Structure des messages MQTT
 ```json
@@ -29,76 +22,22 @@ import (
  */
 
 type RedisEntry struct {
-	IdCaptor 	int
-	IdAirport 	string
-	Measure		string
-	Values		[]RedisCaptorValue
+	Captor 		Captor
 }
-
-func (r *RedisEntry) getIdCaptorToString () string {
-	return strconv.Itoa(r.IdCaptor)
-}
-func (r *RedisEntry) getIdAirportToString () string {
-	return r.IdAirport
-}
-func (r *RedisEntry) getMeasureToString () string {
-	return r.Measure
-}
-func (r *RedisEntry) getValuesToJson () string {
-	res := "["
-	for i := 0 ; i < len(r.Values) ; i++ {
-		res += r.Values[i].getRedisCaptorToJson() + ","
-	}
-	res += "]"
-	return res
-}
-
-type RedisCaptorValue struct {
-	Value		float64
-	Timestamp  	time.Time
-}
-
-func (r *RedisCaptorValue) getRedisCaptorToJson () string {
-	return  `{` +
-			`"value":` 		+ r.getValueToString() 		+ `,` 	+
-			`"timestamp":"` + r.getTimestampToString() 	+ `"` 	+
-		`}`
-}
-
-func (r *RedisCaptorValue) getValueToString () string {
-	return  strconv.FormatFloat(r.Value, 'E', -1, 64)
-}
-
-func (r *RedisCaptorValue) getTimestampToString () string {
-	return r.Timestamp.String()
-}
-
-
 
 func CreateARedisEntry(jsonEntry []byte) *RedisEntry{
-	var e RedisEntry
-	err := json.Unmarshal(jsonEntry, &e)
-	if err != nil {
-		log.Fatal(err)
+	r := RedisEntry{
+		Captor: *CreateACaptor(jsonEntry),
 	}
-	return &e
+	return &r
 }
 
-func (r *RedisEntry) RedisEntryTOString() string {
-	return  `{` +
-				`"idCaptor":` 	+ r.getIdCaptorToString()	+ `,` 	+
-				`"idAirport":"` + r.getIdAirportToString()	+ `",` 	+
-				`"measure":"` 	+ r.getMeasureToString() 	+ `",` 	+
-				`"value":`		+ r.getValuesToJson() 		+
-			`}`
-
-}
-func (r *RedisEntry) RedisEntryToByte () []byte{
-	return []byte(r.RedisEntryTOString())
+func (r *RedisEntry) RedisEntryToJson () []byte{
+	return r.Captor.CaptorToJson()
 }
 
 func (r *RedisEntry) PrintAll() {
-	println(r.RedisEntryTOString())
+	println(r.Captor.CaptorToString())
 }
 
 //func main()  {
