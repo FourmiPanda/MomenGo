@@ -1,9 +1,9 @@
 package redisMqtt
 
 import (
+	"MomenGo/src/myproject/internal/entities"
 	"github.com/gomodule/redigo/redis"
 	"log"
-	"myproject/internal/entities"
 )
 
 type RedisClient struct {
@@ -31,7 +31,7 @@ func (c *RedisClient) connectionToServer() redis.Conn {
 
 func (c *RedisClient) CreateAnEntry(entry *entities.RedisEntry) *redis.Conn {
 	c.connectionToServer()
-	_, err := c.connectionToServer().Do("RPUSH", "captor", entry.RedisEntryTOString())
+	_, err := c.connectionToServer().Do("RPUSH", "captor", entry.RedisEntryToString())
 	if err != nil {
 		log.Fatal(err)
 	}
