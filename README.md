@@ -26,13 +26,10 @@ Exemple :
        {
         "value": 27.8,
         "time":  "2007-03-01T13:00:00Z"
-       },
-       {
-        "value": 21.9,
-        "time":  "2008-03-01T13:00:00Z"
        }
      ]
 }
 ```
-```
+
+Une seule value dans values pour les messages MQTT
     
