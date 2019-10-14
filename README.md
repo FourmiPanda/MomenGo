@@ -4,11 +4,15 @@
 ## Structure des messages MQTT
 ```json
 {
- "idCaptor":  integer,
- "idAirport": string,
- "measure":   string,
- "value":     number,
- "timestamp": timestamp (https://en.wikipedia.org/wiki/ISO_8601)
+ "idCaptor":  "integer",
+ "idAirport": "string",
+ "measure":   "string",
+ "values":     [
+      {
+       "value": "number",
+       "time":  "timestamp (https://en.wikipedia.org/wiki/ISO_8601)"
+      } 
+    ]
 }
 ```
 
@@ -18,8 +22,16 @@ Exemple :
  "idCaptor":  1,
  "idAirport": "BIA",
  "measure":   "Temperature",
- "value":     27.6,
- "timestamp": "2007-03-01T13:00:00Z"
+ "values":     [
+       {
+        "value": 27.8,
+        "time":  "2007-03-01T13:00:00Z"
+       },
+       {
+        "value": 21.9,
+        "time":  "2008-03-01T13:00:00Z"
+       }
+     ]
 }
 ```
 ```
