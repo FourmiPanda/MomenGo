@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"myproject/internal/entities"
 	"os"
 	"path/filepath"
@@ -23,7 +22,7 @@ func main() {
 		fmt.Println("[CAPTEURS] : Sending data ...")
 		for _, v := range conf.Capteurs {
 			client.Publish("/capteurs/"+v.IATA+"/"+v.Type, 0, false,
-				"{\"timestamp\" : "+strconv.FormatInt(time.Now().Unix(), 10)+", \"value\": "+strconv.Itoa(rand.Intn(100))+" }")
+				"{\"timestamp\" : "+strconv.FormatInt(time.Now().Unix(), 10)+", \"value\": "+strconv.Itoa(v.GetValue())+" }")
 		}
 		duration := time.Duration(10) * time.Second
 		time.Sleep(duration)
