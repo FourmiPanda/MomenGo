@@ -22,7 +22,7 @@ func main() {
 		fmt.Println("[CAPTEURS] : Publishing data")
 		for _, v := range conf.Capteurs {
 			client.Publish("/capteurs/"+v.IATA+"/"+v.Type, 0, false,
-				"{\"timestamp\" : "+strconv.FormatInt(time.Now().Unix(), 10)+", \"value\": "+strconv.Itoa(v.GetValue())+" }")
+				"{\"timestamp\" : \""+time.Now().Format("2006-01-02-15-04-05")+"\", \"value\": "+strconv.Itoa(v.GetValue())+" }")
 		}
 		duration := time.Duration(10) * time.Second
 		time.Sleep(duration)
