@@ -26,7 +26,10 @@ func (r *Captor) GetMeasureToString () string {
 func (r *Captor) GetValuesToString () string {
 	res := "["
 	for i := 0 ; i < len(r.Values) ; i++ {
-		res += r.Values[i].GetCaptorValueToString() + ","
+		res += r.Values[i].GetCaptorValueToString()
+		if i != (len(r.Values) - 1) {
+			res += ","
+		}
 	}
 	res += "]"
 	return res
