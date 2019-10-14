@@ -14,6 +14,14 @@ type Captor struct {
 }
 
 
+func CreateACaptor(jsonEntry []byte) *Captor{
+	var e Captor
+	err := json.Unmarshal(jsonEntry, &e)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &e
+}
 func (r *Captor) GetIdCaptorToString () string {
 	return strconv.Itoa(r.IdCaptor)
 }
@@ -39,21 +47,12 @@ func (r *Captor) CaptorToString() string {
 		`"idCaptor":` 	+ r.GetIdCaptorToString()	+ `,` 	+
 		`"idAirport":"` + r.GetIdAirportToString()	+ `",` 	+
 		`"measure":"` 	+ r.GetMeasureToString() 	+ `",` 	+
-		`"value":`		+ r.GetValuesToString() 		+
+		`"value":`		+ r.GetValuesToString() 	+
 		`}`
 
 }
-func CreateACaptor(jsonEntry []byte) *Captor{
-	var e Captor
-	err := json.Unmarshal(jsonEntry, &e)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return &e
-}
-
 func (c *Captor) CaptorToJson () []byte{
-	res,err := json.Marshal(c.CaptorToString())
+	res,err := json.Marshal(c)
 	if err != nil {
 		log.Fatal(err)
 	}
