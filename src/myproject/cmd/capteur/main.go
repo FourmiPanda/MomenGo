@@ -19,7 +19,7 @@ func main() {
 
 	fmt.Println("Connected !")
 	for {
-		fmt.Println("[CAPTEURS] : Sending data ...")
+		fmt.Println("[CAPTEURS] : Publishing data")
 		for _, v := range conf.Capteurs {
 			client.Publish("/capteurs/"+v.IATA+"/"+v.Type, 0, false,
 				"{\"timestamp\" : "+strconv.FormatInt(time.Now().Unix(), 10)+", \"value\": "+strconv.Itoa(v.GetValue())+" }")
