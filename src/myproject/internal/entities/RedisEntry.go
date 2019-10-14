@@ -11,11 +11,19 @@ import (
 ## Structure des messages MQTT
 ```json
 {
- "idCaptor":1,
- "idAirport":"BIA",
- "measure":"Temperature",
- "value":27,
- "timestamp":"2007-03-01T13:00:00Z"
+ "idCaptor":  1,
+ "idAirport": "BIA",
+ "measure":   "Temperature",
+ "values":     [
+       {
+        "value": 27.8,
+        "time":  "2007-03-01T13:00:00Z"
+       },
+       {
+        "value": 21.9,
+        "time":  "2008-03-01T13:00:00Z"
+       }
+     ]
 }
 ```
  */
@@ -24,9 +32,27 @@ type RedisEntry struct {
 	IdCaptor 	int
 	IdAirport 	string
 	Measure		string
-	Value		float64
-	Timestamp  	string
+	Values		[]RedisCaptorValue
 }
+
+func (r *RedisEntry) getIdCaptorToString () string {
+	return strconv.Itoa(r.IdCaptor)
+}
+func (r *RedisEntry) getIdAirportToString () string {
+	return r.IdAirport
+}
+func (r *RedisEntry) getMeasureToString () string {
+	return r.Measure
+}
+func (r *RedisEntry) getValuesToJson () string {
+	res := "["
+	for i := 0 ; i < len(r.Values) ; i++ {
+		res += r.Values[i].getRedisCaptorToJson() + ","
+	}
+	res += "]"
+	return res
+}
+
 type RedisCaptorValue struct {
 	Value		float64
 	Timestamp  	time.Time
@@ -57,13 +83,13 @@ func CreateARedisEntry(jsonEntry []byte) *RedisEntry{
 	}
 	return &e
 }
+
 func (r *RedisEntry) RedisEntryTOString() string {
 	return  `{` +
-				`"idCaptor":` 	+ strconv.Itoa(r.IdCaptor) 					+ `,` 	+
-				`"idAirport":"` + r.IdAirport 								+ `",` 	+
-				`"measure":"` 	+ r.Measure 								+ `",` 	+
-				`"value":` 		+ strconv.FormatFloat(r.Value, 'E', -1, 64) + `,` 	+
-				`"timestamp":"` + r.Timestamp 								+ `"` 	+
+				`"idCaptor":` 	+ r.getIdCaptorToString()	+ `,` 	+
+				`"idAirport":"` + r.getIdAirportToString()	+ `",` 	+
+				`"measure":"` 	+ r.getMeasureToString() 	+ `",` 	+
+				`"value":`		+ r.getValuesToJson() 		+
 			`}`
 
 }
@@ -72,11 +98,7 @@ func (r *RedisEntry) RedisEntryToByte () []byte{
 }
 
 func (r *RedisEntry) PrintAll() {
-	println(r.IdCaptor)
-	println(r.IdAirport)
-	println(r.Measure)
-	println(r.Value)
-	println(r.Timestamp)
+	println(r.RedisEntryTOString())
 }
 
 //func main()  {
