@@ -1,8 +1,8 @@
 package main
 
 import (
-	"MomenGo/src/myproject/cmd/redisMqtt"
-	"MomenGo/src/myproject/internal/entities"
+	"myproject/cmd/redisMqtt"
+	"myproject/internal/entities"
 )
 
 func main()  {

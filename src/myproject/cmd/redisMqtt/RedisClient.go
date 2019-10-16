@@ -1,7 +1,7 @@
 package redisMqtt
 
 import (
-	"MomenGo/src/myproject/internal/entities"
+	"myproject/internal/entities"
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"strings"

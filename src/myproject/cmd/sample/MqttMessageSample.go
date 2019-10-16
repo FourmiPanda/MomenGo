@@ -1,7 +1,7 @@
 package main
 
 import (
-	"MomenGo/src/myproject/internal/entities"
+	"myproject/internal/entities"
 	"strings"
 )
 
