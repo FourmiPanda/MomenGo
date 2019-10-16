@@ -22,32 +22,32 @@ func CreateACaptor(jsonEntry []byte) *Captor{
 	}
 	return &e
 }
-func (r *Captor) GetIdCaptorToString () string {
-	return strconv.Itoa(r.IdCaptor)
+func (c *Captor) GetIdCaptorToString () string {
+	return strconv.Itoa(c.IdCaptor)
 }
-func (r *Captor) GetIdAirportToString () string {
-	return r.IdAirport
+func (c *Captor) GetIdAirportToString () string {
+	return c.IdAirport
 }
-func (r *Captor) GetMeasureToString () string {
-	return r.Measure
+func (c *Captor) GetMeasureToString () string {
+	return c.Measure
 }
-func (r *Captor) GetValuesToString () string {
+func (c *Captor) GetValuesToString () string {
 	res := "["
-	for i := 0 ; i < len(r.Values) ; i++ {
-		res += r.Values[i].GetCaptorValueToString()
-		if i != (len(r.Values) - 1) {
+	for i := 0 ; i < len(c.Values) ; i++ {
+		res += c.Values[i].GetCaptorValueToString()
+		if i != (len(c.Values) - 1) {
 			res += ","
 		}
 	}
 	res += "]"
 	return res
 }
-func (r *Captor) CaptorToString() string {
+func (c *Captor) CaptorToString() string {
 	return  `{` +
-		`"idCaptor":` 	+ r.GetIdCaptorToString()	+ `,` 	+
-		`"idAirport":"` + r.GetIdAirportToString()	+ `",` 	+
-		`"measure":"` 	+ r.GetMeasureToString() 	+ `",` 	+
-		`"value":`		+ r.GetValuesToString() 	+
+		`"idCaptor":` 	+ c.GetIdCaptorToString()	+ `,` 	+
+		`"idAirport":"` + c.GetIdAirportToString()	+ `",` 	+
+		`"measure":"` 	+ c.GetMeasureToString() 	+ `",` 	+
+		`"values":`		+ c.GetValuesToString() 	+
 		`}`
 
 }
@@ -57,4 +57,12 @@ func (c *Captor) CaptorToJson () []byte{
 		log.Fatal(err)
 	}
 	return res
+}
+
+func (c *Captor) GetCaptorValues() []string {
+	var values []string
+	for i := 0 ; i < len(c.Values) ; i++ {
+		values = append(values, string(c.Values[i].GetCaptorValueToJson()))
+	}
+	return values
 }

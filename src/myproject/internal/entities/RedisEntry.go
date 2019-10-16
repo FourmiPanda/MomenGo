@@ -22,15 +22,30 @@ package entities
  */
 
 type RedisEntry struct {
-	Captor 		Captor
+	Captor 		*Captor
 }
 
-func CreateARedisEntry(jsonEntry []byte) *RedisEntry{
+func CreateARedisEntryFromByte(jsonEntry []byte) *RedisEntry{
 	r := RedisEntry{
-		Captor: *CreateACaptor(jsonEntry),
+		Captor: CreateACaptor(jsonEntry),
 	}
 	return &r
 }
+
+func CreateARedisEntryFromMqtt(mqtt *MqttMessage) *RedisEntry{
+	r := RedisEntry{
+		Captor: mqtt.Captor,
+	}
+	return &r
+}
+
+func CreateARedisEntryFromCaptor(captor *Captor) *RedisEntry{
+	r := RedisEntry{
+		Captor: captor,
+	}
+	return &r
+}
+
 
 func (r *RedisEntry) RedisEntryToJson () []byte{
 	return r.Captor.CaptorToJson()
@@ -41,6 +56,21 @@ func (r *RedisEntry) RedisEntryToString () string{
 
 func (r *RedisEntry) PrintAll() {
 	println(r.Captor.CaptorToString())
+}
+func (r *RedisEntry) GetCaptorValues () []string{
+	return r.Captor.GetCaptorValues()
+}
+func (r *RedisEntry) GetCaptorHashes () string{
+	return "idCaptor " + r.Captor.GetIdCaptorToString() + " idAirport " + r.Captor.GetIdAirportToString() + " measure " + r.Captor.GetMeasureToString() + " values " +r.CaptorValuesKey()
+}
+func (r *RedisEntry) CaptorKey() string {
+	return "Captor:" + r.GetLeftKey()
+}
+func (r *RedisEntry) CaptorValuesKey() string {
+	return "CaptorValues:" + r.GetLeftKey()
+}
+func (r *RedisEntry) GetLeftKey() string {
+	return r.Captor.GetIdAirportToString() + ":" + r.Captor.GetMeasureToString() + ":" + r.Captor.GetIdCaptorToString()
 }
 
 //func main()  {
