@@ -9,3 +9,8 @@ type Broker struct {
 	Url  string
 	Port string
 }
+
+type RedisDB struct {
+	Network string
+	Address string
+}
