@@ -2,7 +2,6 @@ package entities
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -25,7 +24,7 @@ func CreateACaptor(jsonEntry []byte) *Captor{
 
 	return &e
 }
-func (c *Captor) AddValuesFromJson(jsonValues []byte) *Captor {
+func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 	//fmt.Println("DEBUG :", "AddValuesFromJson")
 	/* jsonValues is supposed to have this format :
 		{
@@ -48,16 +47,22 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) *Captor {
 	//For Debug purpose
 	//fmt.Println("DEBUG : p =", p)
 	//fmt.Println("DEBUG : ps =", ps)
+	var val *CaptorValue
+	var err error
 	for i := 0; i < end ; i++ {
 		// add the "}" lost during the split
 		if i != end - 1{
 			ps[i] += "}"
 		}
 		//fmt.Println("DEBUG : ps[",i,"] =", ps[i])
-		c.Values = append(c.Values, CreateACaptorValue([]byte(ps[i])))
+		val, err = CreateACaptorValue([]byte(ps[i]))
+		if err != nil {
+			break
+		}
+		c.Values = append(c.Values, val)
 	}
-	fmt.Println(c.CaptorToString())
-	return c
+	//fmt.Println("DEBUG : c.CaptorToString ",c.CaptorToString())
+	return c, err
 }
 func (c *Captor) IsEmpty() bool {
 	res := true
