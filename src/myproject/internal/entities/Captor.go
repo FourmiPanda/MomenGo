@@ -2,8 +2,10 @@ package entities
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type Captor struct {
@@ -20,8 +22,44 @@ func CreateACaptor(jsonEntry []byte) *Captor{
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return &e
 }
+func (c *Captor) AddValuesFromJson(jsonValues []byte) *Captor {
+	//fmt.Println("DEBUG :", "AddValuesFromJson")
+	/* jsonValues is supposed to have this format :
+		{
+			"value": 10,
+			"timestamp": "2007-03-01T13:00:00Z"
+		},
+		{
+			"value":32.1,
+			"timestamp":"2008-03-01T13:00:00Z"
+		}
+	*/
+	// Remove space frome the payload and convert it to string
+
+	p := strings.Join(
+		strings.Fields(string(jsonValues)),
+		"")
+	//// Create a slice of every values contained in the payload
+	ps := strings.Split(p,"},")
+	end := len(ps)
+	//For Debug purpose
+	//fmt.Println("DEBUG : p =", p)
+	//fmt.Println("DEBUG : ps =", ps)
+	for i := 0; i < end ; i++ {
+		// add the "}" lost during the split
+		if i != end - 1{
+			ps[i] += "}"
+		}
+		//fmt.Println("DEBUG : ps[",i,"] =", ps[i])
+		c.Values = append(c.Values, CreateACaptorValue([]byte(ps[i])))
+	}
+	fmt.Println(c.CaptorToString())
+	return c
+}
+
 func (c *Captor) GetIdCaptorToString () string {
 	return strconv.Itoa(c.IdCaptor)
 }
