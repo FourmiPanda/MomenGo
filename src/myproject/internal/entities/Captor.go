@@ -81,14 +81,16 @@ func (c *Captor) GetValuesToString () string {
 	return res
 }
 func (c *Captor) CaptorToString() string {
-	return  `{` +
-		`"idCaptor":` 	+ c.GetIdCaptorToString()	+ `,` 	+
-		`"idAirport":"` + c.GetIdAirportToString()	+ `",` 	+
-		`"measure":"` 	+ c.GetMeasureToString() 	+ `",` 	+
-		`"values":`		+ c.GetValuesToString() 	+
-		`}`
-
+	return  string(c.CaptorToJson())
 }
+//func (c *Captor) CaptorToString() string {
+//	return  `{` +
+//		`"idCaptor":` 	+ c.GetIdCaptorToString()	+ `,` 	+
+//		`"idAirport":"` + c.GetIdAirportToString()	+ `",` 	+
+//		`"measure":"` 	+ c.GetMeasureToString() 	+ `",` 	+
+//		`"values":`		+ c.GetValuesToString() 	+
+//		`}`
+//}
 func (c *Captor) CaptorToJson () []byte{
 	res,err := json.Marshal(c)
 	if err != nil {
