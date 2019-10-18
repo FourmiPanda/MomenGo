@@ -3,6 +3,7 @@ package entities
 type Configuration struct {
 	Broker   Broker
 	Capteurs []Capteur
+	Redis    RedisDB
 }
 
 type Broker struct {

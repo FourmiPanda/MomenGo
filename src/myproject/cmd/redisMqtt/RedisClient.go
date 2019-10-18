@@ -1,9 +1,9 @@
 package redisMqtt
 
 import (
-	"MomenGo/src/myproject/internal/entities"
 	"github.com/gomodule/redigo/redis"
 	"log"
+	"myproject/internal/entities"
 	"strings"
 )
 
@@ -12,11 +12,11 @@ type RedisClient struct {
 	conn    redis.Conn
 }
 
-func CreateARedisClient(network string, address string) RedisClient {
-	return RedisClient{config: entities.RedisDB{Network: network, Address: address}, conn: nil}
+func CreateARedisClient(network string, address string) *RedisClient {
+	return &RedisClient{config: entities.RedisDB{Network: network, Address: address}, conn: nil}
 }
-func CreateARedisClientFromConfig(config entities.RedisDB) RedisClient {
-	return RedisClient{config: config, conn: nil}
+func CreateARedisClientFromConfig(config entities.RedisDB) *RedisClient {
+	return &RedisClient{config: config, conn: nil}
 }
 
 func (r *RedisClient) connectionToServer() redis.Conn {
@@ -47,13 +47,24 @@ func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry)  {
 	defer r.conn.Close()
 	// Ensure there is already a table for this Captor and this CaptorValues
 	if r.doesKeysExists(key) {
-		for i := 0 ; i < len(values) ; i++ {
+		for i := 0; i < len(values); i++ {
+			//For DEBUG purpose
+			//println("DEBUG :","RPUSH", entry.CaptorValuesKey(), values[i])
 			_, err := r.connectionToServer().Do("RPUSH", entry.CaptorValuesKey(), values[i])
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
+	} else if entry.Captor.IsEmpty(){
+		log.Fatal("WARNING : There is no value in this RedisEntry")
 	} else {
+		//For DEBUG purpose
+		//println("DEBUG :","HMSET", entry.CaptorKey(),
+		//	"idAirport", entry.Captor.GetIdAirportToString(),
+		//	"idCaptor", entry.Captor.GetIdCaptorToString(),
+		//	"measure", entry.Captor.GetMeasureToString(),
+		//	"day", "lol",
+		//	"values", entry.CaptorValuesKey())
 		_, err := r.connectionToServer().Do("HMSET", entry.CaptorKey(),
 			"idAirport", entry.Captor.GetIdAirportToString(),
 			"idCaptor", entry.Captor.GetIdCaptorToString(),

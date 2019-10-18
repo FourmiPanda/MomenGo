@@ -1,6 +1,6 @@
 package main
 
-import "MomenGo/src/myproject/internal/entities"
+import "myproject/internal/entities"
 
 func main()  {
 	// How to create a Captor
