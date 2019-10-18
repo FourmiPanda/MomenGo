@@ -45,7 +45,7 @@ func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry)  {
 	values := entry.GetCaptorValues()
 	r.connectionToServer()
 	defer r.conn.Close()
-	// Ensure there is already a table for this Captor and this CaptorValues
+	// Ensure there is already a hashes for this Captor and this CaptorValues
 	if r.doesKeysExists(key) {
 		for i := 0; i < len(values); i++ {
 			//For DEBUG purpose
@@ -54,6 +54,7 @@ func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry)  {
 			if err != nil {
 				log.Fatal(err)
 			}
+			log.Println("New entry added to the CaptorValues list", values[i])
 		}
 	} else if entry.Captor.IsEmpty(){
 		log.Fatal("WARNING : There is no value in this RedisEntry")
@@ -74,6 +75,7 @@ func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry)  {
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Println("New Captor hashes created", entry.RedisEntryToString())
 		r.AddCaptorEntryToDB(entry)
 	}
 }
