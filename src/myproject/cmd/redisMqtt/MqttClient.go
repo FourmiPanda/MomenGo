@@ -47,19 +47,27 @@ func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient{
 		m.ConnectClient()
 	}
 	m.Token = m.MqttClient.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		println("DEBUG :",msg.Topic())
-		println("DEBUG :",string(msg.Payload()))
+		//println("DEBUG : msg.Topic ",msg.Topic())
+		//println("DEBUG : msg.Payload ",string(msg.Payload()))
+
 		// Create a MqttMessage from the topic and payload received
-		mMqtt := entities.CreateAMqttMessageFromPublish(msg.Topic(),msg.Payload())
-		println("DEBUG :",mMqtt.MqttMessageToString())
-		println("DEBUG :",string(mMqtt.MqttMessageToJson()))
-		// Create a RedisEntry from the MqttMessage
-		re := entities.CreateARedisEntryFromMqtt(mMqtt)
-		println("DEBUG :",re.RedisEntryToString())
-		// Create a RedisClient from the configuration
-		rc := CreateARedisClientFromConfig(m.Configuration.Redis)
-		// Add the RedisEntru to the database
-		rc.AddCaptorEntryToDB(re)
+		mMqtt, err := entities.CreateAMqttMessageFromPublish(msg.Topic(),msg.Payload())
+		if err != nil {
+			log.Println("The payload received is not valid :")
+			log.Println(string(msg.Payload()))
+			log.Println("This entry will not be add to the database")
+		} else {
+			//println("DEBUG : mMqtt.MqttMessageToString ",mMqtt.MqttMessageToString())
+
+			// Create a RedisEntry from the MqttMessage
+			re := entities.CreateARedisEntryFromMqtt(mMqtt)
+			//println("DEBUG : re.RedisEntryToString",re.RedisEntryToString())
+
+			// Create a RedisClient from the configuration
+			rc := CreateARedisClientFromConfig(m.Configuration.Redis)
+			// Add the RedisEntru to the database
+			rc.AddCaptorEntryToDB(re)
+		}
 	})
 	m.Token.Wait()
 	if m.Token.Error() != nil {
