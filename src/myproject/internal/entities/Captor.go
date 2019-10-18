@@ -59,7 +59,13 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) *Captor {
 	fmt.Println(c.CaptorToString())
 	return c
 }
-
+func (c *Captor) IsEmpty() bool {
+	res := true
+	for i := 0 ; i < len(c.Values) ; i++ {
+		res = res && c.Values[i].IsEmpty()
+	}
+	return res
+}
 func (c *Captor) GetIdCaptorToString () string {
 	return strconv.Itoa(c.IdCaptor)
 }

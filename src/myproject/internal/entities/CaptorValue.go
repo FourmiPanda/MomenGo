@@ -31,7 +31,9 @@ func CreateACaptorValue(jsonEntry []byte) *CaptorValue{
 	}
 	return &e
 }
-
+func (c *CaptorValue) IsEmpty() bool {
+	return *c == CaptorValue{}
+}
 //func (c *CaptorValue) GetCaptorValueToString () string {
 //	return  `{` +
 //		`"value":` 		+ c.GetValueToString() 		+ `,` 	+
