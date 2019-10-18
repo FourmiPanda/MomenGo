@@ -12,7 +12,7 @@ type CaptorValue struct {
 	Timestamp  	time.Time
 }
 
-func CreateACaptorValue(jsonEntry []byte) *CaptorValue{
+func CreateACaptorValue(jsonEntry []byte) (*CaptorValue,error){
 	// jsonEntry is supposed to have this format :
 	/*
 		{
@@ -27,11 +27,14 @@ func CreateACaptorValue(jsonEntry []byte) *CaptorValue{
 	var e CaptorValue
 	err := json.Unmarshal(jsonEntry, &e)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error on Unmarshal jsonEntry")
+		log.Println(err)
 	}
-	return &e
+	return &e,err
 }
-
+func (c *CaptorValue) IsEmpty() bool {
+	return *c == CaptorValue{}
+}
 //func (c *CaptorValue) GetCaptorValueToString () string {
 //	return  `{` +
 //		`"value":` 		+ c.GetValueToString() 		+ `,` 	+
