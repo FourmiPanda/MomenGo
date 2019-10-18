@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -33,18 +32,17 @@ func CreateAMqttMessage(captor *Captor) *MqttMessage{
 	}
 	return &c
 }
-func CreateAMqttMessageFromPublish(topic string, payload []byte) *MqttMessage{
+func CreateAMqttMessageFromPublish(topic string, payload []byte) (*MqttMessage, error){
 	m := MqttMessage{}
 	m.createAMqttMessageFromTopic(topic)
-	m.addValuesFromPayload(payload)
-	return &m
+	_, err := m.addValuesFromPayload(payload)
+	return &m, err
 }
-func (m *MqttMessage) addValuesFromPayload(payload []byte) *MqttMessage {
+func (m *MqttMessage) addValuesFromPayload(payload []byte) (*MqttMessage, error) {
 	//fmt.Println("DEBUG :", "addValuesFromPayload")
-	fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
-	m.Captor.AddValuesFromJson(payload)
-	fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
-	return  m
+	_, err := m.Captor.AddValuesFromJson(payload)
+	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
+	return  m, err
 }
 func CreateAMqttMessageFromByte(json []byte) *MqttMessage{
 	c := MqttMessage{
@@ -65,12 +63,12 @@ func (m* MqttMessage) createAMqttMessageFromTopic(topic string) *MqttMessage {
 }
 func (m* MqttMessage) createACaptorFromATopic(topic string) *Captor {
 	t := strings.Split(topic,"/")
-	fmt.Println("DEBUG :",t)
+	//fmt.Println("DEBUG : topic ",t)
 	idAirport := t[2]
 	IdCaptor, _ := strconv.ParseInt(t[4], 10, 64)
 	measure := t[3]
 	emptyValue := []*CaptorValue{}
 	m.Captor = &Captor{IdAirport:idAirport,IdCaptor:int(IdCaptor),Measure:measure, Values:emptyValue}
-	fmt.Println("DEBUG :",m.MqttMessageToString())
+	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
 	return m.Captor
 }
