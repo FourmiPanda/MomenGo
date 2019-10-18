@@ -33,6 +33,19 @@ func CreateAMqttMessage(captor *Captor) *MqttMessage{
 	}
 	return &c
 }
+func CreateAMqttMessageFromPublish(topic string, payload []byte) *MqttMessage{
+	m := MqttMessage{}
+	m.createAMqttMessageFromTopic(topic)
+	m.addValuesFromPayload(payload)
+	return &m
+}
+func (m *MqttMessage) addValuesFromPayload(payload []byte) *MqttMessage {
+	//fmt.Println("DEBUG :", "addValuesFromPayload")
+	fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
+	m.Captor.AddValuesFromJson(payload)
+	fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
+	return  m
+}
 func CreateAMqttMessageFromByte(json []byte) *MqttMessage{
 	c := MqttMessage{
 		Captor: CreateACaptor(json),
