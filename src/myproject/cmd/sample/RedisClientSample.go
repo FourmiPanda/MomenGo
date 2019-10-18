@@ -32,6 +32,10 @@ func main()  {
 	// Create a RedisEntry with the mqtt message receive
 	r := entities.CreateARedisEntryFromMqtt(m)
 	println("This is the RedisEntry produced :\t", r.RedisEntryToString())
+	println("This is the key of the Captor hash")
+	println(r.CaptorKey())
+	println("This is the key of the CaptorValues list")
+	println(r.CaptorValuesKey())
 
 	// Create a RedisClient with the config
 	rc := redisMqtt.CreateARedisClientFromConfig(config)

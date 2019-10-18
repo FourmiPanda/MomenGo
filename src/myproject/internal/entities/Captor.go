@@ -2,9 +2,11 @@ package entities
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Captor struct {
@@ -49,6 +51,7 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 	//fmt.Println("DEBUG : ps =", ps)
 	var val *CaptorValue
 	var err error
+	y,m,d := time.Now().Date()
 	for i := 0; i < end ; i++ {
 		// add the "}" lost during the split
 		if i != end - 1{
@@ -57,6 +60,13 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 		//fmt.Println("DEBUG : ps[",i,"] =", ps[i])
 		val, err = CreateACaptorValue([]byte(ps[i]))
 		if err != nil {
+			break
+		}
+		if i == 0 {
+			y,m,d = val.Timestamp.Date()
+		} else if d != val.Timestamp.Day() || m != val.Timestamp.Month() || y != val.Timestamp.Year(){
+			err = errors.New("Error the values pass are not from the same day")
+			log.Println(err)
 			break
 		}
 		c.Values = append(c.Values, val)
