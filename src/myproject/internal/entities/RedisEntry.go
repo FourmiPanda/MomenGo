@@ -1,5 +1,9 @@
 package entities
 
+import (
+	"strconv"
+)
+
 /*
 ## Structure des messages MQTT
 ```json
@@ -67,10 +71,14 @@ func (r *RedisEntry) CaptorKey() string {
 	return "Captor:" + r.GetLeftKey()
 }
 func (r *RedisEntry) CaptorValuesKey() string {
-	return "CaptorValues:" + r.GetLeftKey()
+	return "CaptorValues:" + r.GetLeftKey() + ":" + r.GetDayDate()
 }
 func (r *RedisEntry) GetLeftKey() string {
 	return r.Captor.GetIdAirportToString() + ":" + r.Captor.GetMeasureToString() + ":" + r.Captor.GetIdCaptorToString()
+}
+func (r *RedisEntry) GetDayDate() string {
+	y,m,d := r.Captor.Values[0].Timestamp.Date()
+	return strconv.Itoa(y) + ":" + strconv.Itoa(int(m)) + ":" + strconv.Itoa(d)
 }
 
 //func main()  {
