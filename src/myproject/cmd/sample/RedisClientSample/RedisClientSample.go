@@ -1,11 +1,11 @@
-package main
+package RedisClientSample
 
 import (
 	"myproject/cmd/redisMqtt"
 	"myproject/internal/entities"
 )
 
-func main()  {
+func main() {
 	// To create un RedisClient you can use a config
 	config := entities.RedisDB{Network: "tcp", Address: "localhost:6379"}
 
@@ -48,7 +48,7 @@ func main()  {
 
 	// Get the entry of the captor created
 	v := rc.GetAllCaptorValuesEntry(r.CaptorValuesKey())
-	for i := 0 ; i < len(v) ; i++ {
+	for i := 0; i < len(v); i++ {
 		println(v[i])
 	}
 }
