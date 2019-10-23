@@ -1,4 +1,4 @@
-package main
+package ConfigSample
 
 import (
 	"encoding/json"
