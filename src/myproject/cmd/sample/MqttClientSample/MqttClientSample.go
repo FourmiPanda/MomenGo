@@ -1,13 +1,13 @@
-package main
+package MqttClientSample
 
 import (
 	"myproject/cmd/redisMqtt"
 	"myproject/internal/entities"
 )
 
-func main ()  {
+func main() {
 	c := entities.Configuration{
-		Broker:   entities.Broker{Url:"tcp://localhost",Port:"1883"},
+		Broker:   entities.Broker{Url: "tcp://localhost", Port: "1883"},
 		Capteurs: nil,
 		Redis:    entities.RedisDB{Network: "tcp", Address: "localhost:6379"},
 	}
