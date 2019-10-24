@@ -1,4 +1,4 @@
-package CaptorSample
+package main
 
 import "myproject/internal/entities"
 
