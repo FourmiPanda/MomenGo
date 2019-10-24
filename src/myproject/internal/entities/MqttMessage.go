@@ -72,3 +72,24 @@ func (m* MqttMessage) createACaptorFromATopic(topic string) *Captor {
 	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
 	return m.Captor
 }
+func (m *MqttMessage) MqttMessageToSliceString() [][]string  {
+	/*
+		[][]string{
+			[]string{
+				"AAI",
+				"TEMP",
+				"1",
+				"23.8",
+				"2007-03-01T13:00:00Z"}}
+	 */
+	var res [][]string
+	for i := 0; i < len(m.Captor.Values); i++{
+		res[i] = []string{
+			m.Captor.GetIdAirportToString(),
+			m.Captor.GetMeasureToString(),
+			m.Captor.GetIdCaptorToString(),
+			m.Captor.Values[i].GetValueToString(),
+			m.Captor.Values[i].GetTimestampToString()}
+	}
+	return res
+}
