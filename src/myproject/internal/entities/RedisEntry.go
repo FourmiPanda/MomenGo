@@ -2,6 +2,7 @@ package entities
 
 import (
 	"strconv"
+	"time"
 )
 
 /*
@@ -64,21 +65,28 @@ func (r *RedisEntry) PrintAll() {
 func (r *RedisEntry) GetCaptorValues () []string{
 	return r.Captor.GetCaptorValues()
 }
-func (r *RedisEntry) GetCaptorHashes () string{
-	return "idCaptor " + r.Captor.GetIdCaptorToString() + " idAirport " + r.Captor.GetIdAirportToString() + " measure " + r.Captor.GetMeasureToString() + " values " +r.CaptorValuesKey()
+func (r *RedisEntry) GetCaptorValueAsJson (idVal int) string {
+	return r.Captor.Values[idVal].GetCaptorValueToString()
 }
 func (r *RedisEntry) CaptorKey() string {
-	return "Captor:" + r.GetLeftKey()
+	return "Captor:" + r.GetCaptorLeftKey()
 }
-func (r *RedisEntry) CaptorValuesKey() string {
-	return "CaptorValues:" + r.GetLeftKey() + ":" + r.GetDayDate()
+func (r *RedisEntry) CaptorValuesKey(idVal int) string {
+	return "CaptorValues:" + r.GetCaptorLeftKey() + ":" + r.GetDayDate(idVal)
 }
-func (r *RedisEntry) GetLeftKey() string {
+func (r *RedisEntry) GetCaptorLeftKey() string {
 	return r.Captor.GetIdAirportToString() + ":" + r.Captor.GetMeasureToString() + ":" + r.Captor.GetIdCaptorToString()
 }
-func (r *RedisEntry) GetDayDate() string {
-	y,m,d := r.Captor.Values[0].Timestamp.Date()
+func (r *RedisEntry) GetDayDate(idVal int) string {
+	y,m,d := r.Captor.Values[idVal].Timestamp.Date()
 	return strconv.Itoa(y) + ":" + strconv.Itoa(int(m)) + ":" + strconv.Itoa(d)
+}
+func (r *RedisEntry) GetDayDateAsInt(idVal int) int{
+	y,m,d := r.Captor.Values[idVal].Timestamp.Date()
+	return int (time.Date(y, m, d, 0, 0, 0, 0, time.UTC).Unix())
+}
+func (r *RedisEntry) GetTimestampAsInt(idVal int) int{
+	return int (r.Captor.Values[idVal].Timestamp.Unix())
 }
 
 //func main()  {
