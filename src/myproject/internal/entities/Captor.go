@@ -127,3 +127,9 @@ func (c *Captor) GetCaptorValues() []string {
 	}
 	return values
 }
+func (c *Captor) GetDayDate(idVal int) string {
+	return c.Values[idVal].GetDayDate()
+}
+func (c *Captor) GetDayDateAsInt(idVal int) int{
+	return c.Values[idVal].GetDayDateAsInt()
+}

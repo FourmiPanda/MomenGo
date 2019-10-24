@@ -1,5 +1,6 @@
 package entities
 
+import "C"
 import (
 	"encoding/json"
 	"log"
@@ -59,4 +60,11 @@ func (c *CaptorValue) GetCaptorValueToJson () []byte {
 		log.Fatal(err)
 	}
 	return res
+}
+func (c *CaptorValue) GetDayDate() string {
+	y,m,d := c.Timestamp.Date()
+	return strconv.Itoa(y) + ":" + strconv.Itoa(int(m)) + ":" + strconv.Itoa(d)
+}
+func (c *CaptorValue) GetDayDateAsInt() int{
+	return int (c.Timestamp.Unix())
 }
