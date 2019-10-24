@@ -1,11 +1,11 @@
-package main
+package MqttMessageSample
 
 import (
 	"myproject/internal/entities"
 	"strings"
 )
 
-func main()  {
+func main() {
 	// How to create a MqttMessage
 	// You need a JSON entry
 	// To have a JSON just create a byte array with JSON Formatted string
@@ -37,7 +37,6 @@ func main()  {
 	println(c.CaptorToString())
 
 	// To convert a MqttMessage into a json byte array
-	println("MqttMessage in JSON: ","\t",string(m.MqttMessageToJson()))
-	println("Original JSON","\t\t",strings.Join(strings.Fields(string(j)), ""))
+	println("MqttMessage in JSON: ", "\t", string(m.MqttMessageToJson()))
+	println("Original JSON", "\t\t", strings.Join(strings.Fields(string(j)), ""))
 }
-

@@ -1,8 +1,8 @@
-package main
+package CaptorSample
 
 import "myproject/internal/entities"
 
-func main()  {
+func main() {
 	// How to create a Captor
 	// You need a JSON entry
 	// To have a JSON just create a byte array with JSON Formatted string
@@ -30,11 +30,11 @@ func main()  {
 	println(c.CaptorToString())
 
 	// To get access to Captor's values
-	println("idAirport: ","\t",c.IdAirport)
-	println("idCaptor: ","\t",c.IdCaptor)
+	println("idAirport: ", "\t", c.IdAirport)
+	println("idCaptor: ", "\t", c.IdCaptor)
 
 	// As values can contain multiple value
 	// So you can call a single value or use Captor's method to show them all
-	println("First value of the captor : ",c.Values[0].GetValueToString())
-	println("All value of the captor : ",c.GetValuesToString())
+	println("First value of the captor : ", c.Values[0].GetValueToString())
+	println("All value of the captor : ", c.GetValuesToString())
 }
