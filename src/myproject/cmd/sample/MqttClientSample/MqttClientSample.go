@@ -1,4 +1,4 @@
-package MqttClientSample
+package main
 
 import (
 	"myproject/cmd/redisMqtt"
