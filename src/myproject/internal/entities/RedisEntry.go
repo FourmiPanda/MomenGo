@@ -52,8 +52,11 @@ func CreateARedisEntryFromCaptor(captor *Captor) *RedisEntry{
 }
 
 
-func (r *RedisEntry) RedisEntryToJson () []byte{
+func (r *RedisEntry) RedisEntryToJson () string{
 	return r.Captor.CaptorToJson()
+}
+func (r *RedisEntry) RedisEntryToSliceByte () []byte{
+	return r.Captor.CaptorToSliceByte()
 }
 func (r *RedisEntry) RedisEntryToString () string{
 	return r.Captor.CaptorToString()
