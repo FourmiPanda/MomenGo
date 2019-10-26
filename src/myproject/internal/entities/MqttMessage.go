@@ -56,7 +56,7 @@ func (r *MqttMessage) MqttMessageToString() string {
 }
 
 func (m *MqttMessage) MqttMessageToJson() []byte {
-	return m.Captor.CaptorToJson()
+	return m.Captor.CaptorToSliceByte()
 }
 func (m* MqttMessage) createAMqttMessageFromTopic(topic string) *MqttMessage {
 	return &MqttMessage{m.createACaptorFromATopic(topic)}

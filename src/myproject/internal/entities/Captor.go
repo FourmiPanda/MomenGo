@@ -140,3 +140,53 @@ func (c *Captor) GetDayDate(idVal int) string {
 func (c *Captor) GetDayDateAsInt(idVal int) int{
 	return c.Values[idVal].GetDayDateAsInt()
 }
+func (c *Captor) GetMean() (float64, error) {
+	len := len(c.Values)
+	if len == 0 {
+		return 0, errors.New("WARNING : " +
+			c.GetIdAirportToString()+ ":" +
+			c.GetMeasureToString() 	+ ":" +
+			c.GetIdCaptorToString() +  " has no values for the mean.")
+	}
+
+	var res, sum float64
+	for _, i := range c.Values {
+		sum += i.Value
+	}
+	res = sum / float64(len)
+	return res, nil
+}
+func GetSliceMean(captors []Captor) (float64, error) {
+	len := len(captors)
+	if len == 0 {
+		return 0, errors.New("There is no captor in this slice.")
+	}
+
+	var res, sum float64
+	var err error
+	for _, i := range captors {
+		val, err2 := i.GetMean()
+		if err2 != nil {
+			err = err2
+		}
+		sum += val
+	}
+	res = sum / float64(len)
+	return res, err
+}
+func MergeEqualsCaptors(captors []Captor) []Captor {
+	var res []Captor
+	for _, i := range captors {
+		if len(res) == 0 {
+			res = append(res, i)
+			continue
+		}
+		for _, j := range res {
+			if j.IdCaptor == i.IdCaptor && j.IdAirport == i.IdAirport && j.Measure == i.Measure {
+				j.Values = append(j.Values, i.Values...)
+				break
+			}
+		}
+	}
+	return res
+}
