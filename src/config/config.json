@@ -6,14 +6,20 @@
   "Capteurs": [
     {
       "Id": 1,
-      "IATA": "AAA",
-      "Type": "temperature",
+      "IATA": "BIA",
+      "Type": "TEMP",
       "QoS": 0
     },
     {
       "Id": 2,
-      "IATA": "BBB",
-      "Type": "atmospheric_pressure",
+      "IATA": "NTE",
+      "Type": "PRES",
+      "QoS": 0
+    },
+    {
+      "Id": 3,
+      "IATA": "NTE",
+      "Type": "WIND",
       "QoS": 0
     }
   ]
