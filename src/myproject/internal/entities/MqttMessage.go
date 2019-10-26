@@ -1,6 +1,8 @@
 package entities
 
 import (
+	"errors"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -58,19 +60,30 @@ func (r *MqttMessage) MqttMessageToString() string {
 func (m *MqttMessage) MqttMessageToJson() []byte {
 	return m.Captor.CaptorToSliceByte()
 }
-func (m* MqttMessage) createAMqttMessageFromTopic(topic string) *MqttMessage {
-	return &MqttMessage{m.createACaptorFromATopic(topic)}
+func (m* MqttMessage) createAMqttMessageFromTopic(topic string) (*MqttMessage, error) {
+	res, err := m.createACaptorFromATopic(topic)
+	if err != nil {
+		log.Println(err)
+	}
+	return &MqttMessage{Captor:res}, err
 }
-func (m* MqttMessage) createACaptorFromATopic(topic string) *Captor {
+func (m* MqttMessage) createACaptorFromATopic(topic string) (*Captor, error) {
 	t := strings.Split(topic,"/")
+	if len(t) < 5 {
+		return nil, errors.New("WARNING : Unhandled topic form " + strings.Join(t, "/"))
+	}
 	//fmt.Println("DEBUG : topic ",t)
 	idAirport := t[2]
-	IdCaptor, _ := strconv.ParseInt(t[4], 10, 64)
+	IdCaptor, errIC := strconv.ParseInt(t[4], 10, 64)
+	if errIC != nil {
+		return nil, errors.New("WARNING : Unhandled topic form " + strings.Join(t, "/") + "\n" +
+			t[4] + " is supposed to be an integer")
+	}
 	measure := t[3]
 	emptyValue := []*CaptorValue{}
 	m.Captor = &Captor{IdAirport:idAirport,IdCaptor:int(IdCaptor),Measure:measure, Values:emptyValue}
 	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
-	return m.Captor
+	return m.Captor, nil
 }
 func (m *MqttMessage) MqttMessageToSliceString() [][]string  {
 	/*
