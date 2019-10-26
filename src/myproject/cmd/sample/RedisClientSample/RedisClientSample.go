@@ -23,6 +23,18 @@ func main() {
 					"timestamp":"2007-03-01T13:05:05Z"
 				},
 				{
+					"value":37.8,
+					"timestamp":"2007-03-01T13:06:05Z"
+				},
+				{
+					"value":207.8,
+					"timestamp":"2007-03-01T13:07:05Z"
+				},
+				{
+					"value":32.1,
+					"timestamp":"2008-03-01T13:05:05Z"
+				},
+				{
 					"value":32.1,
 					"timestamp":"2008-03-01T13:05:05Z"
 				}
@@ -51,15 +63,13 @@ func main() {
 	fmt.Println("Keys between 2000 and 2019",keys)
 
 	// Get the values correspond to the interval chosen before
-	var res []string
+	var res []entities.Captor
 	for i := 0; i < len(keys); i++ {
-		val, _ := rc.GetAllCaptorValuesEntries(keys[i])
-		for j := 0 ; j < len(val) ; j++  {
-			res = append(res,val[j])
-		}
+		val, _ := rc.GetAllCaptorValuesOfADay(keys[i])
+		res = append(res,val)
 	}
 	fmt.Println("This are the values stored in the db :")
 	for i := 0; i < len(res) ; i++  {
-		fmt.Println(res[i])
+		fmt.Println(res[i].CaptorToString())
 	}
 }
