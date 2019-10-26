@@ -53,9 +53,7 @@ func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient{
 		// Create a MqttMessage from the topic and payload received
 		mMqtt, err := entities.CreateAMqttMessageFromPublish(msg.Topic(),msg.Payload())
 		if err != nil {
-			log.Println("The payload received is not valid :")
-			log.Println(string(msg.Payload()))
-			log.Println("This entry will not be add to the database")
+			log.Println(err)
 		} else {
 			//println("DEBUG : mMqtt.MqttMessageToString ",mMqtt.MqttMessageToString())
 
