@@ -131,13 +131,38 @@ func (r *RedisClient) GetCaptorValuesEntriesInInterval(key string, start time.Ti
 	return res, err
 }
 
-func (r *RedisClient) GetAllCaptorValuesEntries(key string) ([]string, error) {
+func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, error) {
 	r.connectionToServer()
-	res, err := redis.Strings(r.conn.Do("ZRANGE", key, "0","-1"))
+	q, err := redis.ByteSlices(r.conn.Do("ZRANGE", key, "0","-1"))
 	if err != nil {
 		log.Println(err)
 	}
 	defer r.conn.Close()
+	k := strings.Split(key, ":")
+	idCaptor, err := strconv.Atoi(k[3])
+	idAirport := k[1]
+	measure := k[2]
+
+	if err != nil {
+		log.Println(err)
+		return entities.Captor{}, err
+	}
+
+	res := entities.Captor{
+		IdCaptor:  idCaptor,
+		IdAirport: idAirport,
+		Measure:   measure,
+		Values:    nil,
+	}
+
+	for _, p := range q  {
+		_, err = res.AddValuesFromJson(p)
+		if err != nil {
+			log.Println(err)
+			return entities.Captor{}, err
+		}
+	}
+
 	return res, err
 }
 
