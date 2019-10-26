@@ -35,10 +35,16 @@ func CreateAMqttMessage(captor *Captor) *MqttMessage{
 	return &c
 }
 func CreateAMqttMessageFromPublish(topic string, payload []byte) (*MqttMessage, error){
-	m := MqttMessage{}
-	m.createAMqttMessageFromTopic(topic)
-	_, err := m.addValuesFromPayload(payload)
-	return &m, err
+
+	m, err := createAMqttMessageFromTopic(topic)
+	if err != nil {
+		return nil, err
+	}
+	_, err2 := m.addValuesFromPayload(payload)
+	if err2 != nil {
+		err2 = errors.New("Incorrect payload : " + string(payload) + "\n\t" + err2.Error())
+	}
+	return m, err2
 }
 func (m *MqttMessage) addValuesFromPayload(payload []byte) (*MqttMessage, error) {
 	//fmt.Println("DEBUG :", "addValuesFromPayload")
@@ -60,14 +66,14 @@ func (r *MqttMessage) MqttMessageToString() string {
 func (m *MqttMessage) MqttMessageToJson() []byte {
 	return m.Captor.CaptorToSliceByte()
 }
-func (m* MqttMessage) createAMqttMessageFromTopic(topic string) (*MqttMessage, error) {
-	res, err := m.createACaptorFromATopic(topic)
+func createAMqttMessageFromTopic(topic string) (*MqttMessage, error) {
+	res, err := createACaptorFromATopic(topic)
 	if err != nil {
 		log.Println(err)
 	}
 	return &MqttMessage{Captor:res}, err
 }
-func (m* MqttMessage) createACaptorFromATopic(topic string) (*Captor, error) {
+func createACaptorFromATopic(topic string) (*Captor, error) {
 	t := strings.Split(topic,"/")
 	if len(t) < 5 {
 		return nil, errors.New("WARNING : Unhandled topic form " + strings.Join(t, "/"))
@@ -81,9 +87,9 @@ func (m* MqttMessage) createACaptorFromATopic(topic string) (*Captor, error) {
 	}
 	measure := t[3]
 	emptyValue := []*CaptorValue{}
-	m.Captor = &Captor{IdAirport:idAirport,IdCaptor:int(IdCaptor),Measure:measure, Values:emptyValue}
+	captor := &Captor{IdAirport:idAirport,IdCaptor:int(IdCaptor),Measure:measure, Values:emptyValue}
 	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
-	return m.Captor, nil
+	return captor, nil
 }
 func (m *MqttMessage) MqttMessageToSliceString() [][]string  {
 	/*
