@@ -102,7 +102,14 @@ func (c *Captor) GetValuesToString () string {
 	return res
 }
 func (c *Captor) CaptorToString() string {
-	return  string(c.CaptorToJson())
+	return  string(c.CaptorToSliceByte())
+}
+func (c *Captor) CaptorToJson() string {
+	res,err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(res)
 }
 //func (c *Captor) CaptorToString() string {
 //	return  `{` +
@@ -112,7 +119,7 @@ func (c *Captor) CaptorToString() string {
 //		`"values":`		+ c.GetValuesToString() 	+
 //		`}`
 //}
-func (c *Captor) CaptorToJson () []byte{
+func (c *Captor) CaptorToSliceByte() []byte{
 	res,err := json.Marshal(c)
 	if err != nil {
 		log.Fatal(err)
