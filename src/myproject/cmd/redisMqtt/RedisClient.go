@@ -4,6 +4,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"myproject/internal/entities"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -114,6 +115,45 @@ func (r *RedisClient) GetACaptorValuesKeyInInterval(key string, start time.Time,
 	}
 	return res, err
 }
+
+func (r *RedisClient) GetAllCaptorValuesOfPresForADay(dayDate time.Time) ([]entities.Captor, error) {
+	return r.GetAllCaptorValuesOfMeasureForADay("PRES", dayDate)
+}
+func (r *RedisClient) GetAllCaptorValuesOfWindForADay(dayDate time.Time) ([]entities.Captor, error) {
+	return r.GetAllCaptorValuesOfMeasureForADay("WIND", dayDate)
+}
+func (r *RedisClient) GetAllCaptorValuesOfTempForADay(dayDate time.Time) ([]entities.Captor, error) {
+	return r.GetAllCaptorValuesOfMeasureForADay("TEMP", dayDate)
+}
+func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate time.Time) ([]entities.Captor, error) {
+	var res []entities.Captor
+
+	r.connectionToServer()
+
+	y := strconv.Itoa(dayDate.Year())
+	m := strconv.Itoa(int(dayDate.Month()))
+	d := strconv.Itoa(dayDate.Day())
+
+	keys, err := redis.Strings(r.conn.Do("keys","*:"+measure+":*:"+y+":"+m+":"+d))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	for _, key := range keys {
+		q, err2 := r.GetAllCaptorValuesOfADay(key)
+		if err2 != nil {
+			log.Println(err2)
+			continue
+		}
+		res = append(res, q)
+	}
+
+	res = entities.MergeEqualsCaptors(res)
+
+	return res, nil
+}
+
 func (r *RedisClient) GetACaptorValuesEntriesInInterval(key string, start time.Time, end time.Time) ([]string, error) {
 	r.connectionToServer()
 	res, err := redis.Strings(r.conn.Do("ZRANGEBYSCORE", key, start.Unix(), end.Unix()))
