@@ -1,3 +1,8 @@
+/**
+ * MQTT TOOLS
+ *
+ * @description :: Utils function for MQTT client
+ */
 package redisMqtt
 
 import (
@@ -8,18 +13,20 @@ import (
 )
 
 type MqttClient struct {
-	Configuration	*entities.Configuration
-	MqttClientOpts 	mqtt.ClientOptions
-	MqttClient 		mqtt.Client
-	Token 			mqtt.Token
+	Configuration  *entities.Configuration
+	MqttClientOpts mqtt.ClientOptions
+	MqttClient     mqtt.Client
+	Token          mqtt.Token
 }
-func (m *MqttClient) SetOptions (broker *entities.Broker) *mqtt.ClientOptions {
+
+func (m *MqttClient) SetOptions(broker *entities.Broker) *mqtt.ClientOptions {
 	m.MqttClientOpts = *mqtt.NewClientOptions()
-	m.MqttClientOpts.AddBroker(m.Configuration.Broker.Url+":"+ m.Configuration.Broker.Port)
+	m.MqttClientOpts.AddBroker(m.Configuration.Broker.Url + ":" + m.Configuration.Broker.Port)
 	m.MqttClientOpts.SetKeepAlive(2 * time.Second)
 	m.MqttClientOpts.SetPingTimeout(1 * time.Second)
 	return &m.MqttClientOpts
 }
+
 func CreateAMqttClientFromConfig(config *entities.Configuration) *MqttClient {
 	m := MqttClient{Configuration: config}
 	m.SetOptions(&config.Broker)
@@ -27,21 +34,22 @@ func CreateAMqttClientFromConfig(config *entities.Configuration) *MqttClient {
 	return &m
 }
 
-func (m *MqttClient) ConnectClient() *MqttClient{
+func (m *MqttClient) ConnectClient() *MqttClient {
 	m.Token = m.MqttClient.Connect()
 	m.Token.Wait()
 	return m
 }
 
-func (m *MqttClient) PublishAMessage(topic string, message string) *MqttClient{
+func (m *MqttClient) PublishAMessage(topic string, message string) *MqttClient {
 	// Publishing a message //
 	if !m.MqttClient.IsConnected() {
 		m.ConnectClient()
 	}
-	m.MqttClient.Publish(topic,0,false, message).Wait()
+	m.MqttClient.Publish(topic, 0, false, message).Wait()
 	return m
 }
-func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient{
+
+func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient {
 	// Subcribe to a topic //
 	if !m.MqttClient.IsConnected() {
 		m.ConnectClient()
@@ -51,7 +59,7 @@ func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient{
 		//println("DEBUG : msg.Payload ",string(msg.Payload()))
 
 		// Create a MqttMessage from the topic and payload received
-		mMqtt, err := entities.CreateAMqttMessageFromPublish(msg.Topic(),msg.Payload())
+		mMqtt, err := entities.CreateAMqttMessageFromPublish(msg.Topic(), msg.Payload())
 		if err != nil {
 			log.Println(err)
 		} else {

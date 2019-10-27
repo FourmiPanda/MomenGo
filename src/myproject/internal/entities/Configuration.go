@@ -1,3 +1,8 @@
+/**
+ * Configuration model
+ *
+ * @description :: A model definition of a config.
+ */
 package entities
 
 import (

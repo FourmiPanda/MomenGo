@@ -1,3 +1,8 @@
+/**
+ * CaptorMeasure model
+ *
+ * @description :: A model definition of a captor measure.
+ */
 package entities
 
 import "C"
@@ -10,11 +15,11 @@ import (
 )
 
 type CaptorValue struct {
-	Value		float64
-	Timestamp  	time.Time
+	Value     float64
+	Timestamp time.Time
 }
 
-func CreateACaptorValue(jsonEntry []byte) (*CaptorValue,error){
+func CreateACaptorValue(jsonEntry []byte) (*CaptorValue, error) {
 	// jsonEntry is supposed to have this format :
 	/*
 		{
@@ -31,40 +36,43 @@ func CreateACaptorValue(jsonEntry []byte) (*CaptorValue,error){
 	if err != nil {
 		err = errors.New("Error on Unmarshal jsonEntry \n\t" + err.Error())
 	}
-	return &e,err
+	return &e, err
 }
 func (c *CaptorValue) IsEmpty() bool {
 	return *c == CaptorValue{}
 }
+
 //func (c *CaptorValue) GetCaptorValueToString () string {
 //	return  `{` +
 //		`"value":` 		+ c.GetValueToString() 		+ `,` 	+
 //		`"timestamp":"` + c.GetTimestampToString() 	+ `"` 	+
 //		`}`
 //}
-func (c *CaptorValue) GetCaptorValueToString () string {
-	return  string(c.GetCaptorValueToJson())
+func (c *CaptorValue) GetCaptorValueToString() string {
+	return string(c.GetCaptorValueToJson())
 }
 
-func (c *CaptorValue) GetValueToString () string {
-	return  strconv.FormatFloat(c.Value, 'E', -1, 64)
+func (c *CaptorValue) GetValueToString() string {
+	return strconv.FormatFloat(c.Value, 'E', -1, 64)
 }
 
-func (c *CaptorValue) GetTimestampToString () string {
+func (c *CaptorValue) GetTimestampToString() string {
 	return c.Timestamp.String()
 }
 
-func (c *CaptorValue) GetCaptorValueToJson () []byte {
-	res,err := json.Marshal(c)
+func (c *CaptorValue) GetCaptorValueToJson() []byte {
+	res, err := json.Marshal(c)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return res
 }
+
 func (c *CaptorValue) GetDayDate() string {
-	y,m,d := c.Timestamp.Date()
+	y, m, d := c.Timestamp.Date()
 	return strconv.Itoa(y) + ":" + strconv.Itoa(int(m)) + ":" + strconv.Itoa(d)
 }
-func (c *CaptorValue) GetDayDateAsInt() int{
-	return int (c.Timestamp.Unix())
+
+func (c *CaptorValue) GetDayDateAsInt() int {
+	return int(c.Timestamp.Unix())
 }

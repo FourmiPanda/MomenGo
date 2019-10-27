@@ -1,3 +1,9 @@
+/**
+ * Capteur model
+ *
+ * @description :: A model definition of a Capteur.
+ */
+
 package entities
 
 import (
