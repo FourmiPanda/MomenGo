@@ -7,6 +7,7 @@
 package redisMqtt
 
 import (
+	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"myproject/internal/entities"
@@ -224,4 +225,30 @@ func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, err
 	}
 
 	return res, err
+}
+
+func (r *RedisClient) Find(query string) ([]entities.Captor, error) {
+	var res []entities.Captor
+
+	r.connectionToServer()
+
+	keys, err := redis.Strings(r.conn.Do("keys", query))
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(keys)
+
+	for _, key := range keys {
+		q, err2 := r.GetAllCaptorValuesOfADay(key)
+		if err2 != nil {
+			log.Println(err2)
+			continue
+		}
+		res = append(res, q)
+	}
+
+	res = entities.MergeEqualsCaptors(res)
+
+	return res, nil
 }
