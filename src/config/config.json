@@ -22,5 +22,9 @@
       "Type": "WIND",
       "QoS": 0
     }
-  ]
+  ],
+  "Redis": {
+    "Network": "tcp",
+    "Address": "localhost:6379"
+  }
 }

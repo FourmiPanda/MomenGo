@@ -50,7 +50,7 @@ func (m *MqttMessage) addValuesFromPayload(payload []byte) (*MqttMessage, error)
 	//fmt.Println("DEBUG :", "addValuesFromPayload")
 	_, err := m.Captor.AddValuesFromJson(payload)
 	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
-	return  m, err
+	return m, err
 }
 func CreateAMqttMessageFromByte(json []byte) *MqttMessage{
 	c := MqttMessage{
@@ -59,8 +59,8 @@ func CreateAMqttMessageFromByte(json []byte) *MqttMessage{
 	return &c
 }
 
-func (r *MqttMessage) MqttMessageToString() string {
-	return  r.Captor.CaptorToString()
+func (m *MqttMessage) MqttMessageToString() string {
+	return  m.Captor.CaptorToString()
 }
 
 func (m *MqttMessage) MqttMessageToJson() []byte {
@@ -86,7 +86,7 @@ func createACaptorFromATopic(topic string) (*Captor, error) {
 			t[4] + " is supposed to be an integer")
 	}
 	measure := t[3]
-	emptyValue := []*CaptorValue{}
+	var emptyValue []*CaptorValue
 	captor := &Captor{IdAirport:idAirport,IdCaptor:int(IdCaptor),Measure:measure, Values:emptyValue}
 	//fmt.Println("DEBUG : MqttMessage ",m.MqttMessageToString())
 	return captor, nil
@@ -103,12 +103,12 @@ func (m *MqttMessage) MqttMessageToSliceString() [][]string  {
 	 */
 	var res [][]string
 	for i := 0; i < len(m.Captor.Values); i++{
-		res[i] = []string{
+		res = append(res, []string{
 			m.Captor.GetIdAirportToString(),
 			m.Captor.GetMeasureToString(),
 			m.Captor.GetIdCaptorToString(),
 			m.Captor.Values[i].GetValueToString(),
-			m.Captor.Values[i].GetTimestampToString()}
+			m.Captor.Values[i].GetTimestampToString()})
 	}
 	return res
 }
