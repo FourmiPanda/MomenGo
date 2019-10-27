@@ -20,13 +20,36 @@ import (
 
 func main() {
 	// TODO: Start listening for incoming HTTP requests
+	fmt.Println("** REST API is listening on 0.0.0.0:2019 **")
 
 	http.HandleFunc("/mean", GetMean)
+	http.HandleFunc("/search", search)
 	err := http.ListenAndServe(":2019", nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func search(w http.ResponseWriter, r *http.Request) {
+	//TODO: Handle search request
+	fmt.Println("[" + time.Now().String() + "] : Incoming request on ' " + r.URL.Path + "'")
+
+	data := r.URL.Query()
+
+	startDate := data.Get("start_date")
+	endDate := data.Get("end_date")
+	iata := data.Get("iata")
+	measureType := data.Get("type")
+	moyenne := data.Get("moyenne")
+
+	fmt.Println(startDate + " " + endDate + " " + iata + " " + measureType + " " + moyenne)
+
+	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
+
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write([]byte("{\"value:\" : \"1\"}"))
+
 }
 
 func GetMean(w http.ResponseWriter, r *http.Request) {
