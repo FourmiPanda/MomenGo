@@ -23,7 +23,7 @@ type RedisDB struct {
 	Address string
 }
 
-func GetConfig() Configuration {
+func GetConfig() *Configuration {
 	configPath, _ := filepath.Abs("src/config/config.json")
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -36,5 +36,5 @@ func GetConfig() Configuration {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return configuration
+	return &configuration
 }

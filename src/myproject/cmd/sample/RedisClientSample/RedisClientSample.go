@@ -50,7 +50,7 @@ func main() {
 	println(r.CaptorKey())
 
 	// Create a RedisClient with the c
-	rc := redisMqtt.CreateARedisClientFromConfig(&c)
+	rc := redisMqtt.CreateARedisClientFromConfig(c)
 
 	// Add the RedisEntry to the redis DB
 	_ = rc.AddCaptorEntryToDB(r)
