@@ -1,3 +1,13 @@
-<label>Veuillez choisir une date:</label>
-<input type="date" id="start" name="trip-start" value="2018-07-22" min="1960-01-01" max="2029-12-31" [(ngModel)]="meanDate"><br>
-<button type="button" class="btn btn-primary" (click)="getMean()">Primary</button>
+<div id="main">
+    <label>Veuillez choisir une date:</label>
+    <input type="date" id="start" name="trip-start" value="2018-07-22" min="1960-01-01" max="2029-12-31"
+        [(ngModel)]="meanDate"><br>
+    <label>Moyenne de la température :</label> {{tempMean}}
+    <br>
+    <label>Moyenne de la pression :</label>{{windMean}}
+    <br>
+    <label>Moyenne du vent :</label>{{pressurMean}}
+    <br>
+
+    <button type="button" class="btn btn-primary" (click)="getMean()">Primary</button>
+</div>
