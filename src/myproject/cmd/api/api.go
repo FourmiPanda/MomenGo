@@ -28,7 +28,7 @@ func Mean(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(errD)
 	}
 
-	rc := redisMqtt.CreateARedisClientFromConfig(entities.Config.Redis)
+	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
 	temp , _ := rc.GetAllCaptorValuesOfTempForADay(time.Date(y,time.Month(m),d,0,0,0,0,time.UTC))
 	pres , _ := rc.GetAllCaptorValuesOfPresForADay(time.Date(y,time.Month(m),d,0,0,0,0,time.UTC))
 	wind , _ := rc.GetAllCaptorValuesOfWindForADay(time.Date(y,time.Month(m),d,0,0,0,0,time.UTC))
