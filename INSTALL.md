@@ -23,3 +23,9 @@ Set GOROOT and GOPATH :
 ```shell
     GOROOT=YOUR_GO_INSTALLATION_FOLDER
 ```
+
+### 3. Running
+1. Start BROKER MQTT : myproject/cmd/broker/initBroker.go
+2. Start REDIS Server : TODO
+3. Start CAPTORS Publiser : : myproject/cmd/capteur/main.go
+4. Start the REST API : : myproject/cmd/api/api.go

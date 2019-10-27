@@ -1,3 +1,9 @@
+/**
+ * REDIS CLIENT
+ *
+ * @description ::  Manage redis database.
+ */
+
 package redisMqtt
 
 import (
@@ -10,13 +16,14 @@ import (
 )
 
 type RedisClient struct {
-	config 	entities.RedisDB
-	conn    redis.Conn
+	config entities.RedisDB
+	conn   redis.Conn
 }
 
 func CreateARedisClient(network string, address string) *RedisClient {
 	return &RedisClient{config: entities.RedisDB{Network: network, Address: address}, conn: nil}
 }
+
 func CreateARedisClientFromConfig(config *entities.Configuration) *RedisClient {
 	return &RedisClient{config: config.Redis, conn: nil}
 }
@@ -33,7 +40,8 @@ func (r *RedisClient) connectionToServer() redis.Conn {
 	//defer c.conn.Close()
 	return r.conn
 }
-func (r *RedisClient) doesKeysExists (tabKeys []string) bool{
+
+func (r *RedisClient) doesKeysExists(tabKeys []string) bool {
 	res, err := redis.Bool(
 		r.connectionToServer().Do("EXISTS", strings.Join(tabKeys, " ")))
 	if err != nil {
@@ -42,7 +50,7 @@ func (r *RedisClient) doesKeysExists (tabKeys []string) bool{
 	return res
 }
 
-func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry) error{
+func (r *RedisClient) AddCaptorEntryToDB(entry *entities.RedisEntry) error {
 	values := entry.GetCaptorValues()
 	r.connectionToServer()
 	defer r.conn.Close()
@@ -81,6 +89,7 @@ func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry) error{
 	}
 	return nil
 }
+
 //func (r *RedisClient) CreateAnEntry(entry *entities.RedisEntry) *redis.Conn {
 //	r.connectionToServer()
 //	// Ensure there is already an entry for this Captor
@@ -93,11 +102,12 @@ func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry) error{
 //	return &r.conn
 //}
 //
+
 func (r *RedisClient) GetCaptorValuesKeysInInterval(keys []string, start time.Time, end time.Time) ([]string, error) {
 	r.connectionToServer()
 	var res []string
 	var err error
-	for i := 0; i < len(keys) ; i++{
+	for i := 0; i < len(keys); i++ {
 		res, err = r.GetACaptorValuesKeyInInterval(keys[i], start, end)
 		if err != nil {
 			break
@@ -105,6 +115,7 @@ func (r *RedisClient) GetCaptorValuesKeysInInterval(keys []string, start time.Ti
 	}
 	return res, err
 }
+
 func (r *RedisClient) GetACaptorValuesKeyInInterval(key string, start time.Time, end time.Time) ([]string, error) {
 	r.connectionToServer()
 	res, err := redis.Strings(r.conn.Do("ZRANGEBYSCORE", key, start.Unix(), end.Unix()))
@@ -112,9 +123,9 @@ func (r *RedisClient) GetACaptorValuesKeyInInterval(key string, start time.Time,
 		log.Println(err)
 	}
 	defer r.conn.Close()
-	s := strings.Split(key,":")
+	s := strings.Split(key, ":")
 	s[0] = "CaptorValues"
-	key = strings.Join(s,":")
+	key = strings.Join(s, ":")
 	for i := 0; i < len(res); i++ {
 		res[i] = key + ":" + res[i]
 	}
@@ -124,12 +135,15 @@ func (r *RedisClient) GetACaptorValuesKeyInInterval(key string, start time.Time,
 func (r *RedisClient) GetAllCaptorValuesOfPresForADay(dayDate time.Time) ([]entities.Captor, error) {
 	return r.GetAllCaptorValuesOfMeasureForADay("PRES", dayDate)
 }
+
 func (r *RedisClient) GetAllCaptorValuesOfWindForADay(dayDate time.Time) ([]entities.Captor, error) {
 	return r.GetAllCaptorValuesOfMeasureForADay("WIND", dayDate)
 }
+
 func (r *RedisClient) GetAllCaptorValuesOfTempForADay(dayDate time.Time) ([]entities.Captor, error) {
 	return r.GetAllCaptorValuesOfMeasureForADay("TEMP", dayDate)
 }
+
 func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate time.Time) ([]entities.Captor, error) {
 	var res []entities.Captor
 
@@ -139,7 +153,7 @@ func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate
 	m := strconv.Itoa(int(dayDate.Month()))
 	d := strconv.Itoa(dayDate.Day())
 
-	keys, err := redis.Strings(r.conn.Do("keys","*:"+measure+":*:"+y+":"+m+":"+d))
+	keys, err := redis.Strings(r.conn.Do("keys", "*:"+measure+":*:"+y+":"+m+":"+d))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -167,6 +181,7 @@ func (r *RedisClient) GetACaptorValuesEntriesInInterval(key string, start time.T
 	}
 	return res, err
 }
+
 func (r *RedisClient) GetCaptorValuesEntriesInInterval(key string, start time.Time, end time.Time) ([]string, error) {
 	r.connectionToServer()
 	res, err := redis.Strings(r.conn.Do("ZRANGEBYSCORE", key, start.Unix(), end.Unix()))
@@ -178,7 +193,7 @@ func (r *RedisClient) GetCaptorValuesEntriesInInterval(key string, start time.Ti
 
 func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, error) {
 	r.connectionToServer()
-	q, err := redis.ByteSlices(r.conn.Do("ZRANGE", key, "0","-1"))
+	q, err := redis.ByteSlices(r.conn.Do("ZRANGE", key, "0", "-1"))
 	if err != nil {
 		log.Println(err)
 	}
@@ -200,7 +215,7 @@ func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, err
 		Values:    nil,
 	}
 
-	for _, p := range q  {
+	for _, p := range q {
 		_, err = res.AddValuesFromJson(p)
 		if err != nil {
 			log.Println(err)
@@ -210,4 +225,3 @@ func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, err
 
 	return res, err
 }
-

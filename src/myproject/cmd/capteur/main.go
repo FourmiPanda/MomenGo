@@ -1,3 +1,9 @@
+/**
+ * CAPTORS
+ *
+ * @description :: Init the CAPTORS. Captors publish values to the MQTT BROKER.
+ */
+
 package main
 
 import (

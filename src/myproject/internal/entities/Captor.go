@@ -1,3 +1,8 @@
+/**
+ * Captor model
+ *
+ * @description :: A model definition of a CAPTOR.
+ */
 package entities
 
 import (
@@ -9,14 +14,13 @@ import (
 )
 
 type Captor struct {
-	IdCaptor 	int
-	IdAirport 	string
-	Measure		string
-	Values 		[]*CaptorValue
+	IdCaptor  int
+	IdAirport string
+	Measure   string
+	Values    []*CaptorValue
 }
 
-
-func CreateACaptor(jsonEntry []byte) *Captor{
+func CreateACaptor(jsonEntry []byte) *Captor {
 	var e Captor
 	err := json.Unmarshal(jsonEntry, &e)
 	if err != nil {
@@ -25,17 +29,18 @@ func CreateACaptor(jsonEntry []byte) *Captor{
 
 	return &e
 }
-func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
+
+func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor, error) {
 	//fmt.Println("DEBUG :", "AddValuesFromJson")
 	/* jsonValues is supposed to have this format :
-		{
-			"value": 10,
-			"timestamp": "2007-03-01T13:00:00Z"
-		},
-		{
-			"value":32.1,
-			"timestamp":"2008-03-01T13:00:00Z"
-		}
+	{
+		"value": 10,
+		"timestamp": "2007-03-01T13:00:00Z"
+	},
+	{
+		"value":32.1,
+		"timestamp":"2008-03-01T13:00:00Z"
+	}
 	*/
 	// Remove space frome the payload and convert it to string
 	p := strings.Join(
@@ -43,16 +48,16 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 		"")
 
 	//// Create a slice of every values contained in the payload
-	ps := strings.Split(p,"},")
+	ps := strings.Split(p, "},")
 	end := len(ps)
 	//For Debug purpose
 	//fmt.Println("DEBUG : p =", p)
 	//fmt.Println("DEBUG : ps =", ps)
 	var val *CaptorValue
 	var err error
-	for i := 0; i < end ; i++ {
+	for i := 0; i < end; i++ {
 		// add the "}" lost during the split
-		if i != end - 1{
+		if i != end-1 {
 			ps[i] += "}"
 		}
 		//fmt.Println("DEBUG : ps[",i,"] =", ps[i])
@@ -65,25 +70,30 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 	//fmt.Println("DEBUG : c.CaptorToString ",c.CaptorToString())
 	return c, err
 }
+
 func (c *Captor) IsEmpty() bool {
 	res := true
-	for i := 0 ; i < len(c.Values) ; i++ {
+	for i := 0; i < len(c.Values); i++ {
 		res = res && c.Values[i].IsEmpty()
 	}
 	return res
 }
-func (c *Captor) GetIdCaptorToString () string {
+
+func (c *Captor) GetIdCaptorToString() string {
 	return strconv.Itoa(c.IdCaptor)
 }
-func (c *Captor) GetIdAirportToString () string {
+
+func (c *Captor) GetIdAirportToString() string {
 	return c.IdAirport
 }
-func (c *Captor) GetMeasureToString () string {
+
+func (c *Captor) GetMeasureToString() string {
 	return c.Measure
 }
-func (c *Captor) GetValuesToString () string {
+
+func (c *Captor) GetValuesToString() string {
 	res := "["
-	for i := 0 ; i < len(c.Values) ; i++ {
+	for i := 0; i < len(c.Values); i++ {
 		res += c.Values[i].GetCaptorValueToString()
 		if i != (len(c.Values) - 1) {
 			res += ","
@@ -92,16 +102,19 @@ func (c *Captor) GetValuesToString () string {
 	res += "]"
 	return res
 }
+
 func (c *Captor) CaptorToString() string {
-	return  string(c.CaptorToSliceByte())
+	return string(c.CaptorToSliceByte())
 }
+
 func (c *Captor) CaptorToJson() string {
-	res,err := json.MarshalIndent(c, "", "  ")
+	res, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 	}
 	return string(res)
 }
+
 //func (c *Captor) CaptorToString() string {
 //	return  `{` +
 //		`"idCaptor":` 	+ c.GetIdCaptorToString()	+ `,` 	+
@@ -110,8 +123,9 @@ func (c *Captor) CaptorToJson() string {
 //		`"values":`		+ c.GetValuesToString() 	+
 //		`}`
 //}
-func (c *Captor) CaptorToSliceByte() []byte{
-	res,err := json.Marshal(c)
+
+func (c *Captor) CaptorToSliceByte() []byte {
+	res, err := json.Marshal(c)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,24 +134,27 @@ func (c *Captor) CaptorToSliceByte() []byte{
 
 func (c *Captor) GetCaptorValues() []string {
 	var values []string
-	for i := 0 ; i < len(c.Values) ; i++ {
+	for i := 0; i < len(c.Values); i++ {
 		values = append(values, string(c.Values[i].GetCaptorValueToJson()))
 	}
 	return values
 }
+
 func (c *Captor) GetDayDate(idVal int) string {
 	return c.Values[idVal].GetDayDate()
 }
-func (c *Captor) GetDayDateAsInt(idVal int) int{
+
+func (c *Captor) GetDayDateAsInt(idVal int) int {
 	return c.Values[idVal].GetDayDateAsInt()
 }
+
 func (c *Captor) GetMean() (float64, error) {
 	leng := len(c.Values)
 	if leng == 0 {
 		return 0, errors.New("WARNING : " +
-			c.GetIdAirportToString()+ ":" +
-			c.GetMeasureToString() 	+ ":" +
-			c.GetIdCaptorToString() +  " has no values for the mean.")
+			c.GetIdAirportToString() + ":" +
+			c.GetMeasureToString() + ":" +
+			c.GetIdCaptorToString() + " has no values for the mean.")
 	}
 
 	var res, sum float64
@@ -147,6 +164,7 @@ func (c *Captor) GetMean() (float64, error) {
 	res = sum / float64(leng)
 	return res, nil
 }
+
 func GetSliceMean(captors []Captor) (float64, error) {
 	leng := len(captors)
 	if leng == 0 {
@@ -167,6 +185,7 @@ func GetSliceMean(captors []Captor) (float64, error) {
 	res := sum / float64(leng)
 	return res, err
 }
+
 func MergeEqualsCaptors(captors []Captor) []Captor {
 	var res []Captor
 	for _, i := range captors {
