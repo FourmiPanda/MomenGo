@@ -17,8 +17,8 @@ type RedisClient struct {
 func CreateARedisClient(network string, address string) *RedisClient {
 	return &RedisClient{config: entities.RedisDB{Network: network, Address: address}, conn: nil}
 }
-func CreateARedisClientFromConfig(config entities.RedisDB) *RedisClient {
-	return &RedisClient{config: config, conn: nil}
+func CreateARedisClientFromConfig(config *entities.Configuration) *RedisClient {
+	return &RedisClient{config: config.Redis, conn: nil}
 }
 
 func (r *RedisClient) connectionToServer() redis.Conn {
@@ -42,39 +42,44 @@ func (r *RedisClient) doesKeysExists (tabKeys []string) bool{
 	return res
 }
 
-func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry)  {
+func (r *RedisClient) AddCaptorEntryToDB (entry *entities.RedisEntry) error{
 	values := entry.GetCaptorValues()
 	r.connectionToServer()
 	defer r.conn.Close()
 	// Ensure there is already a hashes for this Captor and this CaptorValues
 	for i := 0; i < len(values); i++ {
 		//For DEBUG purpose
-		println("DEBUG :",
-			"ZADD",
-			entry.CaptorKey(),
-			entry.GetDayDateAsInt(i),
-			entry.GetDayDate(i))
-		_, err := r.connectionToServer().Do("ZADD", entry.CaptorKey(),
+		//println("DEBUG :",
+		//	"ZADD",
+		//	entry.CaptorKey(),
+		//	entry.GetDayDateAsInt(i),
+		//	entry.GetDayDate(i))
+		res, err := r.connectionToServer().Do("ZADD", entry.CaptorKey(),
 			entry.GetDayDateAsInt(i),
 			entry.GetDayDate(i))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		log.Println("New entry added to the Captor sorted set", entry.RedisEntryToString())
+		if res.(int64) == 1 {
+			log.Println("New entry added to the Captor sorted set", entry.RedisEntryToString())
+		}
 		//For DEBUG purpose
-		println("DEBUG :",
-			"ZADD",
-			entry.CaptorValuesKey(i),
-			entry.GetTimestampAsInt(i),
-			entry.GetCaptorValueAsJson(i))
-		_, err = r.connectionToServer().Do("ZADD", entry.CaptorValuesKey(i),
+		//println("DEBUG :",
+		//	"ZADD",
+		//	entry.CaptorValuesKey(i),
+		//	entry.GetTimestampAsInt(i),
+		//	entry.GetCaptorValueAsJson(i))
+		res, err = r.connectionToServer().Do("ZADD", entry.CaptorValuesKey(i),
 			entry.GetTimestampAsInt(i),
 			entry.GetCaptorValueAsJson(i))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		log.Println("New entry added to the CaptorValues sorted set", values[i])
+		if res.(int64) == 1 {
+			log.Println("New entry added to the CaptorValues sorted set", values[i])
+		}
 	}
+	return nil
 }
 //func (r *RedisClient) CreateAnEntry(entry *entities.RedisEntry) *redis.Conn {
 //	r.connectionToServer()
@@ -206,6 +211,3 @@ func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, err
 	return res, err
 }
 
-func main() {
-
-}

@@ -7,7 +7,7 @@ import (
 )
 
 func main()  {
-	http.HandleFunc("/mean", api.Mean)
+	http.HandleFunc("/mean", api.GetMean)
 
 	err := http.ListenAndServe(":2019",nil)
 

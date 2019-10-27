@@ -3,6 +3,7 @@ package entities
 import "C"
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"strconv"
 	"time"
@@ -28,8 +29,7 @@ func CreateACaptorValue(jsonEntry []byte) (*CaptorValue,error){
 	var e CaptorValue
 	err := json.Unmarshal(jsonEntry, &e)
 	if err != nil {
-		log.Println("Error on Unmarshal jsonEntry")
-		log.Println(err)
+		err = errors.New("Error on Unmarshal jsonEntry \n\t" + err.Error())
 	}
 	return &e,err
 }

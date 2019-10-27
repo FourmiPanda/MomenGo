@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Captor struct {
@@ -39,10 +38,10 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 		}
 	*/
 	// Remove space frome the payload and convert it to string
-
 	p := strings.Join(
 		strings.Fields(string(jsonValues)),
 		"")
+
 	//// Create a slice of every values contained in the payload
 	ps := strings.Split(p,"},")
 	end := len(ps)
@@ -51,7 +50,6 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 	//fmt.Println("DEBUG : ps =", ps)
 	var val *CaptorValue
 	var err error
-	y,m,d := time.Now().Date()
 	for i := 0; i < end ; i++ {
 		// add the "}" lost during the split
 		if i != end - 1{
@@ -60,13 +58,6 @@ func (c *Captor) AddValuesFromJson(jsonValues []byte) (*Captor,error) {
 		//fmt.Println("DEBUG : ps[",i,"] =", ps[i])
 		val, err = CreateACaptorValue([]byte(ps[i]))
 		if err != nil {
-			break
-		}
-		if i == 0 {
-			y,m,d = val.Timestamp.Date()
-		} else if d != val.Timestamp.Day() || m != val.Timestamp.Month() || y != val.Timestamp.Year(){
-			err = errors.New("Error the values pass are not from the same day")
-			log.Println(err)
 			break
 		}
 		c.Values = append(c.Values, val)
@@ -141,8 +132,8 @@ func (c *Captor) GetDayDateAsInt(idVal int) int{
 	return c.Values[idVal].GetDayDateAsInt()
 }
 func (c *Captor) GetMean() (float64, error) {
-	len := len(c.Values)
-	if len == 0 {
+	leng := len(c.Values)
+	if leng == 0 {
 		return 0, errors.New("WARNING : " +
 			c.GetIdAirportToString()+ ":" +
 			c.GetMeasureToString() 	+ ":" +
@@ -153,25 +144,27 @@ func (c *Captor) GetMean() (float64, error) {
 	for _, i := range c.Values {
 		sum += i.Value
 	}
-	res = sum / float64(len)
+	res = sum / float64(leng)
 	return res, nil
 }
 func GetSliceMean(captors []Captor) (float64, error) {
-	len := len(captors)
-	if len == 0 {
-		return 0, errors.New("There is no captor in this slice.")
+	leng := len(captors)
+	if leng == 0 {
+		return 0, errors.New("there is no captor in this slice")
 	}
 
-	var res, sum float64
 	var err error
+	sum := float64(0)
 	for _, i := range captors {
 		val, err2 := i.GetMean()
 		if err2 != nil {
 			err = err2
+			leng--
+		} else {
+			sum += val
 		}
-		sum += val
 	}
-	res = sum / float64(len)
+	res := sum / float64(leng)
 	return res, err
 }
 func MergeEqualsCaptors(captors []Captor) []Captor {
