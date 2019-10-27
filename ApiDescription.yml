@@ -17,10 +17,10 @@ tags:
     externalDocs:
       description: "Find out more"
       url: "http://swagger.io"
-  - name: "Airports"
-    description: "Operations about airports"
+  - name: "Captor"
+    description: "Information about captors"
     externalDocs:
-      description: "Find out more about our airports"
+      description: "Find out more about our captors"
       url: "http://swagger.io"
 schemes:
   - "http"
@@ -28,7 +28,7 @@ paths:
   /search:
     get:
       tags:
-        - "search"
+        - "Weather"
       summary: "Returns a list of measure that match the search criteria."
       description: "Multiple status values can be provided with comma separated strings"
       operationId: "search"
@@ -59,80 +59,69 @@ paths:
             - "temperature"
             - "pressure"
             - "wind"
+        - name: "moyenne"
+          in: "query"
+          description: "Get the average of measurement"
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "OK"
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/SearchResult"
+              $ref: "#/definitions/Measure"
         400:
           description: "Bad Request"
-  /pet/{petId}:
+  /captors/{captorId}:
     get:
       tags:
-        - "pet"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
+        - "Captor"
+      summary: "Find captor by ID"
+      description: "Returns a single captor"
+      operationId: "getCaptorById"
       produces:
-        - "application/xml"
         - "application/json"
       parameters:
-        - name: "petId"
+        - name: "captorId"
           in: "path"
-          description: "ID of pet to return"
+          description: "ID of captor to return"
           required: true
-          type: "integer"
-          format: "int64"
+          type: "string"
       responses:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Airports"
+            $ref: "#/definitions/Captor"
         400:
           description: "Invalid ID supplied"
         404:
-          description: "Pet not found"
+          description: "Captor not found"
 definitions:
-  Airports:
+  Captor:
     type: "object"
     properties:
       id:
         type: "integer"
         format: "int64"
-      name:
+      IATA:
         type: "string"
-    xml:
-      name: "Tag"
-  SearchResult:
-    type: "object"
-    properties:
       type:
         type: "string"
         enum:
           - "temperature"
           - "pressure"
           - "wind"
-      name:
+      QOS:
+        type: "integer"
+        format: "int64"
+  Measure:
+    type: "object"
+    properties:
+      timestamp:
         type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          name: "photoUrl"
-          wrapped: true
-        items:
-          type: "string"
-      status:
-        type: "string"
-        description: "pet status in the store"
-        enum:
-          - "available"
-          - "pending"
-          - "sold"
-    xml:
-      name: "Pet"
+      value:
+        type: "number"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
