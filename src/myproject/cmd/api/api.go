@@ -32,7 +32,6 @@ func main() {
 }
 
 func search(w http.ResponseWriter, r *http.Request) {
-	//TODO: Handle search request
 	fmt.Println("[" + time.Now().String() + "] : Incoming request on ' " + r.URL.Path + "'")
 
 	data := r.URL.Query()
@@ -45,7 +44,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(startDate + " " + endDate + " " + iata + " " + measureType + " " + moyenne)
 
-	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
+	//TODO: Write the redis query
 
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write([]byte("{\"value:\" : \"1\"}"))
