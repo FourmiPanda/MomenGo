@@ -20,7 +20,7 @@ func (m *MqttClient) SetOptions (broker *entities.Broker) *mqtt.ClientOptions {
 	m.MqttClientOpts.SetPingTimeout(1 * time.Second)
 	return &m.MqttClientOpts
 }
-func CreateAMqttClientFromABroker(config *entities.Configuration) *MqttClient {
+func CreateAMqttClientFromConfig(config *entities.Configuration) *MqttClient {
 	m := MqttClient{Configuration: config}
 	m.SetOptions(&config.Broker)
 	m.MqttClient = mqtt.NewClient(&m.MqttClientOpts)
@@ -53,9 +53,7 @@ func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient{
 		// Create a MqttMessage from the topic and payload received
 		mMqtt, err := entities.CreateAMqttMessageFromPublish(msg.Topic(),msg.Payload())
 		if err != nil {
-			log.Println("The payload received is not valid :")
-			log.Println(string(msg.Payload()))
-			log.Println("This entry will not be add to the database")
+			log.Println(err)
 		} else {
 			//println("DEBUG : mMqtt.MqttMessageToString ",mMqtt.MqttMessageToString())
 
@@ -64,9 +62,12 @@ func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient{
 			//println("DEBUG : re.RedisEntryToString",re.RedisEntryToString())
 
 			// Create a RedisClient from the configuration
-			rc := CreateARedisClientFromConfig(m.Configuration.Redis)
+			rc := CreateARedisClientFromConfig(m.Configuration)
 			// Add the RedisEntru to the database
-			rc.AddCaptorEntryToDB(re)
+			err = rc.AddCaptorEntryToDB(re)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	})
 	m.Token.Wait()
