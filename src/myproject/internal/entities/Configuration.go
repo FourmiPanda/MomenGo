@@ -1,5 +1,12 @@
 package entities
 
+import (
+	"encoding/json"
+	"log"
+	"os"
+	"path/filepath"
+)
+
 type Configuration struct {
 	Broker   Broker
 	Capteurs []Capteur
@@ -16,12 +23,18 @@ type RedisDB struct {
 	Address string
 }
 
-var Config Configuration = Configuration{
-	Broker:   Broker{
-		Url: "tcp://localhost",
-		Port: "1883"},
-	Capteurs: nil,
-	Redis:    RedisDB{
-		Network: "tcp",
-		Address: "localhost:6379"},
+func GetConfig() Configuration {
+	configPath, _ := filepath.Abs("src/config/config.json")
+	file, err := os.Open(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err = decoder.Decode(&configuration)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return configuration
 }
