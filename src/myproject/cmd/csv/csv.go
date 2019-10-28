@@ -1,32 +1,52 @@
 package main
 
 import (
+	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"log"
+	"myproject/internal/entities"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 func main() {
-	conf := getConfig()
-	client := connect(conf.Broker.Url+":"+conf.Broker.Port, "capteurs")
-	var wg sync.WaitGroup
 
-	for _, v := range conf.Capteurs {
-		wg.add(1)
-		fmt.Println("[CAPTEUR-" + strconv.Itoa(v.Id) + "] : Publishing data for airport " + v.IATA)
-		client.Subscribe("/capteurs/"+v.IATA+"/"+v.Type, byte(v.QoS), func(client mqtt.Client, msg mqtt.Message) {
-			json.Unmarshal([]byte(msg.Payload()), &data)
-			fmt.Println("Data received : ", data)
-			csvwritter.AddDataToCsv(data, boot.CsvDataPath)
-		})
-		wg.wait()
-	}
+	file, _ := os.Create("donneesMeteo.csv")
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	writer.Write([]string{"IATA", "Type_Mesure", "Date_Mesure", "Valeur"})
+
+	conf := getConfig()
+	client := connect(conf.Broker.Url+":"+conf.Broker.Port, "clientcsv")
+	var wg sync.WaitGroup
+	wg.Add(1)
+	client.Subscribe("/capteurs/#", 0, func(client mqtt.Client, msg mqtt.Message) {
+		var c entities.CaptorValue
+		json.Unmarshal([]byte(msg.Payload()), &c)
+		var tab = strings.Split(msg.Topic(), "/")
+		//csvLine := "\"" + tab[2] + "\",\"" + tab[3] + "\",\"" + c.Timestamp.String() + "\"," + fmt.Sprintf("%f", c.Value) + ";"
+		fmt.Println("Data received : ", csvLine)
+		writer.Write([]string{tab[2], tab[3], c.Timestamp.String(), fmt.Sprintf("%f", c.Value)})
+		writer.Flush()
+	})
+
+	wg.Wait()
+}
+func handleError(err error) {
+	log.Fatal(err)
 }
 
 func getConfig() entities.Configuration {
-	configPath, _ := filepath.Abs("src/config/config.json")
+	configPath, _ := filepath.Abs("../../../../src/config/config.json")
 	file, err := os.Open(configPath)
 	if err != nil {
 		handleError(err)
