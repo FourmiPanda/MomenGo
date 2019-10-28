@@ -1,4 +1,4 @@
-package MqttClientSample
+package main
 
 import (
 	"myproject/cmd/redisMqtt"
@@ -6,12 +6,8 @@ import (
 )
 
 func main() {
-	c := entities.Configuration{
-		Broker:   entities.Broker{Url: "tcp://localhost", Port: "1883"},
-		Capteurs: nil,
-		Redis:    entities.RedisDB{Network: "tcp", Address: "localhost:6379"},
-	}
-	m := redisMqtt.CreateAMqttClientFromABroker(&c)
+	c := entities.GetConfig()
+	m := redisMqtt.CreateAMqttClientFromConfig(c)
 
 	// Le client MQTT s'abonne à tous les topics contenu dnas capteurs
 	m.SubscribeAToATopic("/capteurs/#")

@@ -1,4 +1,4 @@
-package MqttMessageSample
+package main
 
 import (
 	"myproject/internal/entities"

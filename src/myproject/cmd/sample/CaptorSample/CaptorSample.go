@@ -1,4 +1,4 @@
-package CaptorSample
+package main
 
 import "myproject/internal/entities"
 
@@ -26,7 +26,7 @@ func main() {
 	println(c.CaptorToString())
 
 	// To convert a Captor into a json byte array
-	c = entities.CreateACaptor(c.CaptorToJson())
+	c = entities.CreateACaptor(c.CaptorToSliceByte())
 	println(c.CaptorToString())
 
 	// To get access to Captor's values

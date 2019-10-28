@@ -1,3 +1,8 @@
+/**
+ * BROKER
+ *
+ * @description :: Init the MQTT BROKER.
+ */
 package main
 
 import (
