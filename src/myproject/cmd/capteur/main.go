@@ -56,6 +56,7 @@ func connect(brokerURI string, clientId string) mqtt.Client {
 	opts := createClientOptions(brokerURI, clientId)
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
+	fmt.Println("Connected !")
 	for !token.WaitTimeout(3 * time.Second) {
 	}
 	if err := token.Error(); err != nil {

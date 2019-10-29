@@ -27,6 +27,7 @@ func main() {
 
 	conf := getConfig()
 	client := connect(conf.Broker.Url+":"+conf.Broker.Port, "clientcsv")
+	fmt.Println("Connected !")
 	var wg sync.WaitGroup
 	wg.Add(1)
 	client.Subscribe("/capteurs/#", 0, func(client mqtt.Client, msg mqtt.Message) {

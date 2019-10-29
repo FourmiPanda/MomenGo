@@ -6,6 +6,7 @@
 package main
 
 import (
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 	"sync"
@@ -23,6 +24,8 @@ func main() {
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		log.Fatal(token.Error())
 	}
+
+	fmt.Println("MQTT Broker listening on :1883 ...")
 
 	wg.Wait()
 

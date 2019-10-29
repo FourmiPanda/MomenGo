@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"myproject/internal/entities"
 )
 
@@ -16,6 +17,7 @@ func main() {
 
 	// Le client MQTT s'abonne à tous les topics contenu dnas capteurs
 	m.SubscribeAToATopic("/capteurs/#")
+	fmt.Println("Listening on topic : /capteurs/# ...")
 
 	for {
 		continue
