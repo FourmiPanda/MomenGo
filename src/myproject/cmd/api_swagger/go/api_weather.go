@@ -12,7 +12,6 @@ package swagger
 
 import (
 	"fmt"
-	"myproject/cmd/redisMqtt"
 	"myproject/internal/entities"
 	"net/http"
 	"strings"
@@ -50,7 +49,7 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	//TODO: Write the redis query
 
-	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
+	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
 	res, err := rc.Find(query)
 	if err != nil {
 		badRequest(w)
