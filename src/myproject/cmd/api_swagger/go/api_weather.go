@@ -37,8 +37,6 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		moyenne = true
 	}
 
-	//TODO: Chose the right method
-
 	startDate := data.Get("start_date")
 	endDate := data.Get("end_date")
 
@@ -70,6 +68,9 @@ func getCaptorValues(startDate string, endDate string, measureType string) ([]by
 	if len(ed) != 6 {
 		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong end_date format\"}}")
 	}
+	if measureType != "TEMP" && measureType != "PRES" && measureType != "WIND" {
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong measure type\"}}")
+	}
 
 	startY, errStartY := strconv.Atoi(sd[0])
 	startM, errStartM := strconv.Atoi(sd[1])
@@ -85,17 +86,24 @@ func getCaptorValues(startDate string, endDate string, measureType string) ([]by
 	endMinute, errEndMinute := strconv.Atoi(ed[4])
 	endSecond, errEndSecond := strconv.Atoi(ed[5])
 
-	fmt.Println(startY, startM, startD, startHour, startMinute, startSecond, endY, endM, endD, endHour, endMinute, endSecond)
-
 	if errStartY != nil || errStartM != nil || errStartD != nil || errStartHour != nil || errStartMinute != nil || errStartSecond != nil || errEndY != nil || errEndM != nil || errEndD != nil || errEndHour != nil || errEndMinute != nil || errEndSecond != nil {
 		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
 	}
 
-	//TODO: send redis query
-	//rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
-	//rc.get
+	start := time.Date(startY, time.Month(startM), startD, startHour, startMinute, startSecond, 0, time.UTC)
+	end := time.Date(endY, time.Month(endM), endD, endHour, endMinute, endSecond, 0, time.UTC)
 
-	return []byte("[{\"timestamp\":\"2007-03-01T13:00:00Z\", \"value\": 1}]"), nil
+	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
+	captors, _ := rc.GetAllCaptorValuesOfATypeInInterval(
+		measureType,
+		start,
+		end)
+
+	res, err := json.MarshalIndent(captors, "", "    ")
+	if err != nil {
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"Internal server error\"}}")
+	}
+	return res, nil
 }
 
 //http://localhost:8080/api/search?start_date=2019-11-11-11-11-11&moyenne=true
