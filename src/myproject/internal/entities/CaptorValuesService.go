@@ -50,7 +50,7 @@ func (r *RedisClient) doesKeysExists(tabKeys []string) bool {
 	return res
 }
 
-func (r *RedisClient) AddCaptorEntryToDB(entry RedisEntry) error {
+func (r *RedisClient) AddCaptorEntryToDB(entry *RedisEntry) error {
 	values := entry.GetCaptorValues()
 	r.connectionToServer()
 	defer r.conn.Close()

@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"myproject/cmd/redisMqtt"
 	"myproject/internal/entities"
 	"net/http"
 	"strconv"
@@ -52,7 +51,7 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
+	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
 	temp, errT := rc.GetAllCaptorValuesOfTempForADay(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
 	pres, errP := rc.GetAllCaptorValuesOfPresForADay(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
 	wind, errW := rc.GetAllCaptorValuesOfWindForADay(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
