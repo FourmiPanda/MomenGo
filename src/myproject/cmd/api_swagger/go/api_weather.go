@@ -92,6 +92,8 @@ func getCaptorValues(startDate string, endDate string, measureType string) ([]by
 	}
 
 	//TODO: send redis query
+	//rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
+	//rc.get
 
 	return []byte("[{\"timestamp\":\"2007-03-01T13:00:00Z\", \"value\": 1}]"), nil
 }
