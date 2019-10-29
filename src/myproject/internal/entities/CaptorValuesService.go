@@ -1,31 +1,30 @@
 /**
- * REDIS CLIENT
+ * CaptorValues Service
  *
- * @description ::  Manage redis database.
+ * @description ::  Manage CaptorValues.
  */
 
-package redisMqtt
+package entities
 
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"log"
-	"myproject/internal/entities"
 	"strconv"
 	"strings"
 	"time"
 )
 
 type RedisClient struct {
-	config entities.RedisDB
+	config RedisDB
 	conn   redis.Conn
 }
 
 func CreateARedisClient(network string, address string) *RedisClient {
-	return &RedisClient{config: entities.RedisDB{Network: network, Address: address}, conn: nil}
+	return &RedisClient{config: RedisDB{Network: network, Address: address}, conn: nil}
 }
 
-func CreateARedisClientFromConfig(config *entities.Configuration) *RedisClient {
+func CreateARedisClientFromConfig(config *Configuration) *RedisClient {
 	return &RedisClient{config: config.Redis, conn: nil}
 }
 
@@ -51,7 +50,7 @@ func (r *RedisClient) doesKeysExists(tabKeys []string) bool {
 	return res
 }
 
-func (r *RedisClient) AddCaptorEntryToDB(entry *entities.RedisEntry) error {
+func (r *RedisClient) AddCaptorEntryToDB(entry *RedisEntry) error {
 	values := entry.GetCaptorValues()
 	r.connectionToServer()
 	defer r.conn.Close()
@@ -133,20 +132,20 @@ func (r *RedisClient) GetACaptorValuesKeyInInterval(key string, start time.Time,
 	return res, err
 }
 
-func (r *RedisClient) GetAllCaptorValuesOfPresForADay(dayDate time.Time) ([]entities.Captor, error) {
+func (r *RedisClient) GetAllCaptorValuesOfPresForADay(dayDate time.Time) ([]Captor, error) {
 	return r.GetAllCaptorValuesOfMeasureForADay("PRES", dayDate)
 }
 
-func (r *RedisClient) GetAllCaptorValuesOfWindForADay(dayDate time.Time) ([]entities.Captor, error) {
+func (r *RedisClient) GetAllCaptorValuesOfWindForADay(dayDate time.Time) ([]Captor, error) {
 	return r.GetAllCaptorValuesOfMeasureForADay("WIND", dayDate)
 }
 
-func (r *RedisClient) GetAllCaptorValuesOfTempForADay(dayDate time.Time) ([]entities.Captor, error) {
+func (r *RedisClient) GetAllCaptorValuesOfTempForADay(dayDate time.Time) ([]Captor, error) {
 	return r.GetAllCaptorValuesOfMeasureForADay("TEMP", dayDate)
 }
 
-func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate time.Time) ([]entities.Captor, error) {
-	var res []entities.Captor
+func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate time.Time) ([]Captor, error) {
+	var res []Captor
 
 	r.connectionToServer()
 
@@ -169,7 +168,7 @@ func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate
 		res = append(res, q)
 	}
 
-	res = entities.MergeEqualsCaptors(res)
+	res = MergeEqualsCaptors(res)
 
 	return res, nil
 }
@@ -192,7 +191,7 @@ func (r *RedisClient) GetCaptorValuesEntriesInInterval(key string, start time.Ti
 	return res, err
 }
 
-func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, error) {
+func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (Captor, error) {
 	r.connectionToServer()
 	q, err := redis.ByteSlices(r.conn.Do("ZRANGE", key, "0", "-1"))
 	if err != nil {
@@ -206,10 +205,10 @@ func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, err
 
 	if err != nil {
 		log.Println(err)
-		return entities.Captor{}, err
+		return Captor{}, err
 	}
 
-	res := entities.Captor{
+	res := Captor{
 		IdCaptor:  idCaptor,
 		IdAirport: idAirport,
 		Measure:   measure,
@@ -220,15 +219,15 @@ func (r *RedisClient) GetAllCaptorValuesOfADay(key string) (entities.Captor, err
 		_, err = res.AddValuesFromJson(p)
 		if err != nil {
 			log.Println(err)
-			return entities.Captor{}, err
+			return Captor{}, err
 		}
 	}
 
 	return res, err
 }
 
-func (r *RedisClient) Find(query string) ([]entities.Captor, error) {
-	var res []entities.Captor
+func (r *RedisClient) Find(query string) ([]Captor, error) {
+	var res []Captor
 
 	r.connectionToServer()
 
@@ -248,7 +247,7 @@ func (r *RedisClient) Find(query string) ([]entities.Captor, error) {
 		res = append(res, q)
 	}
 
-	res = entities.MergeEqualsCaptors(res)
+	res = MergeEqualsCaptors(res)
 
 	return res, nil
 }
