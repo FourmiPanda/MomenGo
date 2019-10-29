@@ -11,8 +11,10 @@
 package swagger
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"myproject/internal/entities"
 	"net/http"
 	"strconv"
 	"strings"
@@ -59,14 +61,14 @@ func Search(w http.ResponseWriter, r *http.Request) {
 }
 
 //http://localhost:8080/api/search?start_date=2019-11-11-11-11-11&end_date=2019-11-11-11-11-11&type=temperature
-func getCaptorValues(startDate string, endDate string, measureType string) (string, error) {
+func getCaptorValues(startDate string, endDate string, measureType string) ([]byte, error) {
 	sd := strings.Split(startDate, "-")
 	if len(sd) != 6 {
-		return "", errors.New("{\"err\": {\"msg\": \"wrong start_date format\"}}")
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong start_date format\"}}")
 	}
 	ed := strings.Split(endDate, "-")
 	if len(ed) != 6 {
-		return "", errors.New("{\"err\": {\"msg\": \"wrong end_date format\"}}")
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong end_date format\"}}")
 	}
 
 	startY, errStartY := strconv.Atoi(sd[0])
@@ -86,42 +88,60 @@ func getCaptorValues(startDate string, endDate string, measureType string) (stri
 	fmt.Println(startY, startM, startD, startHour, startMinute, startSecond, endY, endM, endD, endHour, endMinute, endSecond)
 
 	if errStartY != nil || errStartM != nil || errStartD != nil || errStartHour != nil || errStartMinute != nil || errStartSecond != nil || errEndY != nil || errEndM != nil || errEndD != nil || errEndHour != nil || errEndMinute != nil || errEndSecond != nil {
-		return "", errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
 	}
 
 	//TODO: send redis query
 
-	return "[{\"timestamp\":\"2007-03-01T13:00:00Z\", \"value\": 1}]", nil
+	return []byte("[{\"timestamp\":\"2007-03-01T13:00:00Z\", \"value\": 1}]"), nil
 }
 
 //http://localhost:8080/api/search?start_date=2019-11-11-11-11-11&moyenne=true
-func getAverageCaptorValues(date string) (string, error) {
+func getAverageCaptorValues(date string) ([]byte, error) {
 	sd := strings.Split(date, "-")
-	if len(sd) != 6 {
-		return "", errors.New("{\"err\": {\"msg\": \"wrong start_date format\"}}")
+	if len(sd) < 3 {
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong start_date format\"}}")
 	}
 
 	startY, errStartY := strconv.Atoi(sd[0])
 	startM, errStartM := strconv.Atoi(sd[1])
 	startD, errStartD := strconv.Atoi(sd[2])
-	startHour, errStartHour := strconv.Atoi(sd[3])
-	startMinute, errStartMinute := strconv.Atoi(sd[4])
-	startSecond, errStartSecond := strconv.Atoi(sd[5])
-	fmt.Println(startY, startM, startD, startHour, startMinute, startSecond)
 
-	if errStartY != nil || errStartM != nil || errStartD != nil || errStartHour != nil || errStartMinute != nil || errStartSecond != nil {
-		return "", errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
+	if errStartY != nil || errStartM != nil || errStartD != nil {
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
 	}
 
-	//TODO: send redis query
+	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
+	day := time.Date(startY, time.Month(startM), startD, 0, 0, 0, 0, time.UTC)
+	temp, errT := rc.GetAllCaptorValuesOfTempForADay(day)
+	pres, errP := rc.GetAllCaptorValuesOfPresForADay(day)
+	wind, errW := rc.GetAllCaptorValuesOfWindForADay(day)
 
-	return "{\"temperature\": 24.4, \"pressure\": 8.5, \"wind\": 10.04}", nil
+	meanT, errMT := entities.GetSliceMean(temp)
+	meanP, errMP := entities.GetSliceMean(pres)
+	meanW, errMW := entities.GetSliceMean(wind)
+
+	if errT != nil || errP != nil || errW != nil || errMT != nil || errMP != nil || errMW != nil {
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"Internal server error\"}}")
+	}
+
+	j := entities.CreateMean(
+		meanT,
+		meanP,
+		meanW,
+	)
+
+	res, err := json.MarshalIndent(j, "", "    ")
+	if err != nil {
+		return []byte(""), errors.New("{\"err\": {\"msg\": \"Internal server error\"}}")
+	}
+	return res, nil
 }
 
-func WriteJSON(w http.ResponseWriter, data string) {
+func WriteJSON(w http.ResponseWriter, data []byte) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte(data))
+	_, _ = w.Write(data)
 }
 
 func badRequest(w http.ResponseWriter, msg string) {
