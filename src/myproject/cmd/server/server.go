@@ -11,6 +11,6 @@ func main() {
 	err := http.ListenAndServe(":2019", nil)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
