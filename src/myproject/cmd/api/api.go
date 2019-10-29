@@ -22,6 +22,7 @@ func main() {
 	// TODO: Start listening for incoming HTTP requests
 
 	http.HandleFunc("/mean", GetMean)
+	http.HandleFunc("/meanByType", GetMeanByType)
 	err := http.ListenAndServe(":2019", nil)
 
 	if err != nil {
@@ -122,6 +123,147 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 	// For Debug purpose
 	fmt.Println("DEBUG : mean was called")
 	fmt.Println("DEBUG : date reveived ", y, m, d)
+	fmt.Fprint(w, string(res))
+
+}
+func GetMeanByType(w http.ResponseWriter, r *http.Request) {
+	// Supposed to receive :
+	//measure 		: TEMP | PRES | WIND
+	//start_date 	: YYYY-MM-DD-HH-MM-SS
+	//end_date 		: YYYY-MM-DD-HH-MM-SS
+	queryValues := r.URL.Query() // Parse query & return Values
+	measure 	:= queryValues.Get("measure")
+	startDate 	:= strings.Split(queryValues.Get("start_date"),"-")
+	endDate 	:= strings.Split(queryValues.Get("end_date"),"-")
+	switch {
+	case measure == "":
+		fmt.Fprint(w, `{"error":"`+errors.New("measure is not entered").Error()+`"}`)
+		return
+	case measure != "TEMP" && measure != "PRES" && measure != "WIND":
+		fmt.Fprint(w, `{"error":"`+errors.New("measure is not correct").Error()+`"}`)
+		return
+	case queryValues.Get("start_date") == "":
+		fmt.Fprint(w, `{"error":"`+errors.New("start_date is not entered").Error()+`"}`)
+		return
+	case len(startDate) < 6:
+		fmt.Fprint(w, `{"error":"`+errors.New("start_date is not valid").Error()+`"}`)
+		return
+	case queryValues.Get("end_date") == "":
+		fmt.Fprint(w, `{"error":"`+errors.New("end_date is not entered").Error()+`"}`)
+		return
+	case len(startDate) < 6:
+		fmt.Fprint(w, `{"error":"`+errors.New("end_date is not valid").Error()+`"}`)
+		return
+	}
+	sY, errSY := strconv.Atoi(startDate[0])
+	sM, errSM := strconv.Atoi(startDate[1])
+	sD, errSD := strconv.Atoi(startDate[2])
+	sH, errSH := strconv.Atoi(startDate[3])
+	sMi, errSMi := strconv.Atoi(startDate[4])
+	sS, errSS := strconv.Atoi(startDate[5])
+
+	switch {
+	case errSY != nil:
+		log.Println(errSY)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSY.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSM != nil:
+		log.Println(errSM)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSM.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSD != nil:
+		log.Println(errSD)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSD.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSH != nil:
+		log.Println(errSH)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSH.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSMi != nil:
+		log.Println(errSMi)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSMi.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSS != nil:
+		log.Println(errSS)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSS.Error(),`"`,"", -1)+`"}`)
+		return
+	}
+
+	startTime := time.Date(sY,time.Month(sM),sD,sH,sMi,sS,0,time.UTC)
+
+
+	switch {
+	case queryValues.Get("end_date") == "":
+		fmt.Fprint(w, `{"error":"`+errors.New("date is not entered").Error()+`"}`)
+		return
+	case len(startDate) < 3:
+		fmt.Fprint(w, `{"error":"`+errors.New("date is not valid").Error()+`"}`)
+		return
+	}
+	eY, errEY := strconv.Atoi(endDate[0])
+	eM, errEM := strconv.Atoi(endDate[1])
+	eD, errED := strconv.Atoi(endDate[2])
+	eH, errEH := strconv.Atoi(endDate[3])
+	eMi, errEMi := strconv.Atoi(endDate[4])
+	eS, errES := strconv.Atoi(endDate[5])
+
+	switch {
+	case errEY != nil:
+		log.Println(errEY)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errSD.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSM != nil:
+		log.Println(errSM)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errEM.Error(),`"`,"", -1)+`"}`)
+		return
+	case errSD != nil:
+		log.Println(errSD)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errED.Error(),`"`,"", -1)+`"}`)
+		return
+	case errEH != nil:
+		log.Println(errEH)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errEH.Error(),`"`,"", -1)+`"}`)
+		return
+	case errEMi != nil:
+		log.Println(errEMi)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errEMi.Error(),`"`,"", -1)+`"}`)
+		return
+	case errES != nil:
+		log.Println(errES)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errES.Error(),`"`,"", -1)+`"}`)
+		return
+	}
+	endTime := time.Date(eY,time.Month(eM),eD,eH,eMi,eS,0,time.UTC)
+
+
+	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
+	captors, _ := rc.GetAllCaptorValuesOfATypeInInterval(
+		measure,
+		startTime,
+		endTime)
+
+	res, err := json.MarshalIndent(captors,"","    ")
+	if err != nil {
+		log.Println(err)
+		fmt.Fprint(w, err)
+		return
+	}
+
+	// For Debug purpose
+	fmt.Println("DEBUG : mean was called")
+	fmt.Println("DEBUG : start_date reveived ", sY, sM, sD)
 	fmt.Fprint(w, string(res))
 
 }
