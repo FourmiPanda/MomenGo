@@ -11,9 +11,10 @@
 package swagger
 
 import (
+	"errors"
 	"fmt"
-	"myproject/internal/entities"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -23,43 +24,108 @@ func Search(w http.ResponseWriter, r *http.Request) {
 
 	data := r.URL.Query()
 
-	startDate := strings.Split(data.Get("start_date"), "-")
-	if len(startDate) != 3 {
-		badRequest(w)
-		return
-	}
-	endDate := strings.Split(data.Get("end_date"), "-")
-	if len(endDate) != 3 {
-		badRequest(w)
-		return
-	}
-	iata := data.Get("iata")
+	//iata := data.Get("iata")
 	measureType := data.Get("type")
+	if measureType == "temperature" || measureType == "preasure" || measureType == "wind" {
+
+	}
 
 	moyenne := false
-	if data.Get("moyenne") == "" || data.Get("moyenne") == "true" {
+	if data.Get("moyenne") == "true" {
 		moyenne = true
 	}
 
-	//TODO: Use the redis service
+	//TODO: Chose the right method
 
-	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
-
-	if measureType == "" && iata == "" {
-		rc.GetAllCaptorValuesOfPresForADay(time.Now())
-	}
+	startDate := data.Get("start_date")
+	endDate := data.Get("end_date")
 
 	if moyenne {
-
+		avg, err := getAverageCaptorValues(startDate)
+		if err != nil {
+			badRequest(w, err.Error())
+			return
+		}
+		WriteJSON(w, avg)
+		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte(""))
-
+	res, err := getCaptorValues(startDate, endDate, measureType)
+	if err != nil {
+		badRequest(w, err.Error())
+		return
+	}
+	WriteJSON(w, res)
 }
 
-func badRequest(w http.ResponseWriter) {
+//http://localhost:8080/api/search?start_date=2019-11-11-11-11-11&end_date=2019-11-11-11-11-11&type=temperature
+func getCaptorValues(startDate string, endDate string, measureType string) (string, error) {
+	sd := strings.Split(startDate, "-")
+	if len(sd) != 6 {
+		return "", errors.New("{\"err\": {\"msg\": \"wrong start_date format\"}}")
+	}
+	ed := strings.Split(endDate, "-")
+	if len(ed) != 6 {
+		return "", errors.New("{\"err\": {\"msg\": \"wrong end_date format\"}}")
+	}
+
+	startY, errStartY := strconv.Atoi(sd[0])
+	startM, errStartM := strconv.Atoi(sd[1])
+	startD, errStartD := strconv.Atoi(sd[2])
+	startHour, errStartHour := strconv.Atoi(sd[3])
+	startMinute, errStartMinute := strconv.Atoi(sd[4])
+	startSecond, errStartSecond := strconv.Atoi(sd[5])
+
+	endY, errEndY := strconv.Atoi(ed[0])
+	endM, errEndM := strconv.Atoi(ed[1])
+	endD, errEndD := strconv.Atoi(ed[2])
+	endHour, errEndHour := strconv.Atoi(ed[3])
+	endMinute, errEndMinute := strconv.Atoi(ed[4])
+	endSecond, errEndSecond := strconv.Atoi(ed[5])
+
+	fmt.Println(startY, startM, startD, startHour, startMinute, startSecond, endY, endM, endD, endHour, endMinute, endSecond)
+
+	if errStartY != nil || errStartM != nil || errStartD != nil || errStartHour != nil || errStartMinute != nil || errStartSecond != nil || errEndY != nil || errEndM != nil || errEndD != nil || errEndHour != nil || errEndMinute != nil || errEndSecond != nil {
+		return "", errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
+	}
+
+	//TODO: send redis query
+
+	return "[{\"timestamp\":\"2007-03-01T13:00:00Z\", \"value\": 1}]", nil
+}
+
+//http://localhost:8080/api/search?start_date=2019-11-11-11-11-11&moyenne=true
+func getAverageCaptorValues(date string) (string, error) {
+	sd := strings.Split(date, "-")
+	if len(sd) != 6 {
+		return "", errors.New("{\"err\": {\"msg\": \"wrong start_date format\"}}")
+	}
+
+	startY, errStartY := strconv.Atoi(sd[0])
+	startM, errStartM := strconv.Atoi(sd[1])
+	startD, errStartD := strconv.Atoi(sd[2])
+	startHour, errStartHour := strconv.Atoi(sd[3])
+	startMinute, errStartMinute := strconv.Atoi(sd[4])
+	startSecond, errStartSecond := strconv.Atoi(sd[5])
+	fmt.Println(startY, startM, startD, startHour, startMinute, startSecond)
+
+	if errStartY != nil || errStartM != nil || errStartD != nil || errStartHour != nil || errStartMinute != nil || errStartSecond != nil {
+		return "", errors.New("{\"err\": {\"msg\": \"wrong date not integer\"}}")
+	}
+
+	//TODO: send redis query
+
+	return "{\"temperature\": 24.4, \"pressure\": 8.5, \"wind\": 10.04}", nil
+}
+
+func WriteJSON(w http.ResponseWriter, data string) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(data))
+}
+
+func badRequest(w http.ResponseWriter, msg string) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(400)
-	_, _ = w.Write([]byte("Bad request"))
+	_, _ = w.Write([]byte(msg))
 }
