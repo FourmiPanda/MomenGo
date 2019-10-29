@@ -172,6 +172,63 @@ func (r *RedisClient) GetAllCaptorValuesOfMeasureForADay(measure string, dayDate
 
 	return res, nil
 }
+func (r *RedisClient) GetAllCaptorValuesOfATypeInInterval(measure string, startDate time.Time,endDate time.Time) ([]Captor, error) {
+	var res []Captor
+
+	r.connectionToServer()
+	defer r.conn.Close()
+
+	// Get all keys for the "measure" type
+	keysCaptors, err := redis.Strings(r.conn.Do("keys", "Captor:*:"+measure+":*"))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	for _, keyCaptor := range keysCaptors {
+		// keyCaptor = Captor[0]:IATA[1]:MEASURE[2]:ID[3]
+		data := strings.Split(keyCaptor, ":")
+		idCaptor, errId:= strconv.Atoi(data[3])
+		if errId != nil {
+			log.Println(err)
+			continue
+		}
+
+		// Create a Captor from the key
+		c := Captor{
+			IdCaptor:  idCaptor,
+			IdAirport: data[1],
+			Measure:   data[2],
+			Values:    nil,
+		}
+
+		// Get all the keys of the days with recorded values between "startDate" and "endDate"
+		keysValues, err := redis.Strings(r.conn.Do("ZRANGEBYSCORE", keyCaptor, startDate.Unix(), endDate.Unix()))
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		for _, keyValue := range keysValues {
+			// keyValue = Captor[0]:IATA[1]:MEASURE[2]:ID[3]:YYYY[4]:MM[5]:DD[6]
+			// Get all the values of this day between "startDate" and "endDate"
+			currentKey := "CaptorValues:"+data[1]+":"+data[2]+":"+data[3]+":"+keyValue
+			j, err := redis.ByteSlices(r.conn.Do("ZRANGEBYSCORE", currentKey, startDate.Unix(), endDate.Unix()))
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			for _, i := range j {
+				c.AddValuesFromJson(i)
+			}
+		}
+
+		res = append(res, c)
+
+	}
+
+	return res, nil
+}
 
 func (r *RedisClient) GetACaptorValuesEntriesInInterval(key string, start time.Time, end time.Time) ([]string, error) {
 	r.connectionToServer()
