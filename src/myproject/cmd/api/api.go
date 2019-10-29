@@ -21,8 +21,8 @@ import (
 func main() {
 	// TODO: Start listening for incoming HTTP requests
 
-	http.HandleFunc("/mean", GetMean)
-	http.HandleFunc("/meanByType", GetMeanByType)
+	http.HandleFunc("/mean", 		 GetMean)
+	http.HandleFunc("/valuesByType", GetValuesByType)
 	err := http.ListenAndServe(":2019", nil)
 
 	if err != nil {
@@ -126,7 +126,7 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(res))
 
 }
-func GetMeanByType(w http.ResponseWriter, r *http.Request) {
+func GetValuesByType(w http.ResponseWriter, r *http.Request) {
 	// Supposed to receive :
 	//measure 		: TEMP | PRES | WIND
 	//start_date 	: YYYY-MM-DD-HH-MM-SS
