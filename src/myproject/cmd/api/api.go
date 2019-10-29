@@ -46,6 +46,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		iata = "*"
 	}
 	measureType := data.Get("type")
+	query := data.Get("query")
 	if measureType == "" {
 		measureType = "*"
 	}
@@ -57,7 +58,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 	//TODO: Write the redis query
 
 	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
-	res, err := rc.Find("CaptorValues:" + iata + ":" + measureType)
+	res, err := rc.Find(query)
 	if err != nil {
 		badRequest(w)
 		return
@@ -69,8 +70,16 @@ func search(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	jsonRes := "["
+
+	for _, v := range res {
+		jsonRes += "{ \"type\" : \"" + v.Measure + "\"},"
+	}
+
+	jsonRes += "]"
+
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write([]byte("[]"))
+	_, _ = w.Write([]byte(jsonRes))
 
 }
 
