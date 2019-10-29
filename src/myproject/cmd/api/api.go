@@ -7,10 +7,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math"
-	"myproject/cmd/redisMqtt"
 	"myproject/internal/entities"
 	"net/http"
 	"strconv"
@@ -32,7 +32,15 @@ func main() {
 func GetMean(w http.ResponseWriter, r *http.Request) {
 	queryValues := r.URL.Query() // Parse query & return Values
 	date := strings.Split(queryValues.Get("date"), "-")
-
+	switch {
+	case queryValues.Get("date") == "":
+		fmt.Fprint(w, `{"error":"`+errors.New("date is not entered").Error()+`"}`)
+		return
+	case len(date) < 3:
+		fmt.Fprint(w, `{"error":"`+errors.New("date is not valid").Error()+`"}`)
+		return
+	}
+	// Assign year to y, month to m and day to d
 	y, errY := strconv.Atoi(date[0])
 	m, errM := strconv.Atoi(date[1])
 	d, errD := strconv.Atoi(date[2])
@@ -40,19 +48,22 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errY != nil:
 		log.Println(errY)
-		fmt.Fprint(w, errY)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errY.Error(),`"`,"", -1)+`"}`)
 		return
 	case errM != nil:
 		log.Println(errM)
-		fmt.Fprint(w, errM)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errY.Error(),`"`,"", -1)+`"}`)
 		return
 	case errD != nil:
 		log.Println(errD)
-		fmt.Fprint(w, errD)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errY.Error(),`"`,"", -1)+`"}`)
 		return
 	}
 
-	rc := redisMqtt.CreateARedisClientFromConfig(entities.GetConfig())
+	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
 	temp, errT := rc.GetAllCaptorValuesOfTempForADay(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
 	pres, errP := rc.GetAllCaptorValuesOfPresForADay(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
 	wind, errW := rc.GetAllCaptorValuesOfWindForADay(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
@@ -60,15 +71,18 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errT != nil:
 		log.Println(errT)
-		fmt.Fprint(w, errT)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errT.Error(),`"`,"", -1)+`"}`)
 		return
 	case errP != nil:
 		log.Println(errP)
-		fmt.Fprint(w, errP)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errP.Error(),`"`,"", -1)+`"}`)
 		return
 	case errW != nil:
 		log.Println(errW)
-		fmt.Fprint(w, errW)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+strings.Replace(errW.Error(),`"`,"", -1)+`"}`)
 		return
 	}
 
@@ -79,16 +93,13 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errMT != nil:
 		log.Println(errMT)
-		fmt.Fprint(w, errMT)
-		return
+		meanT = 0
 	case errMP != nil:
 		log.Println(errMP)
-		fmt.Fprint(w, errMP)
-		return
+		meanP = 0
 	case errMW != nil:
 		log.Println(errMW)
-		fmt.Fprint(w, errMW)
-		return
+		meanW = 0
 	}
 
 	meanT = math.Round(meanT*100) / 100
@@ -103,7 +114,8 @@ func GetMean(w http.ResponseWriter, r *http.Request) {
 	res, err := json.MarshalIndent(j, "", "    ")
 	if err != nil {
 		log.Println(err)
-		fmt.Fprint(w, err)
+		w.WriteHeader(500)
+		fmt.Fprint(w, `{"error":"`+err.Error()+`"}`)
 		return
 	}
 

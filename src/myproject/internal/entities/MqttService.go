@@ -3,23 +3,22 @@
  *
  * @description :: Utils function for MQTT client
  */
-package redisMqtt
+package entities
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
-	"myproject/internal/entities"
 	"time"
 )
 
 type MqttClient struct {
-	Configuration  *entities.Configuration
+	Configuration  *Configuration
 	MqttClientOpts mqtt.ClientOptions
 	MqttClient     mqtt.Client
 	Token          mqtt.Token
 }
 
-func (m *MqttClient) SetOptions(broker *entities.Broker) *mqtt.ClientOptions {
+func (m *MqttClient) SetOptions(broker *Broker) *mqtt.ClientOptions {
 	m.MqttClientOpts = *mqtt.NewClientOptions()
 	m.MqttClientOpts.AddBroker(m.Configuration.Broker.Url + ":" + m.Configuration.Broker.Port)
 	m.MqttClientOpts.SetKeepAlive(2 * time.Second)
@@ -27,7 +26,7 @@ func (m *MqttClient) SetOptions(broker *entities.Broker) *mqtt.ClientOptions {
 	return &m.MqttClientOpts
 }
 
-func CreateAMqttClientFromConfig(config *entities.Configuration) *MqttClient {
+func CreateAMqttClientFromConfig(config *Configuration) *MqttClient {
 	m := MqttClient{Configuration: config}
 	m.SetOptions(&config.Broker)
 	m.MqttClient = mqtt.NewClient(&m.MqttClientOpts)
@@ -59,14 +58,14 @@ func (m *MqttClient) SubscribeAToATopic(topic string) *MqttClient {
 		//println("DEBUG : msg.Payload ",string(msg.Payload()))
 
 		// Create a MqttMessage from the topic and payload received
-		mMqtt, err := entities.CreateAMqttMessageFromPublish(msg.Topic(), msg.Payload())
+		mMqtt, err := CreateAMqttMessageFromPublish(msg.Topic(), msg.Payload())
 		if err != nil {
 			log.Println(err)
 		} else {
 			//println("DEBUG : mMqtt.MqttMessageToString ",mMqtt.MqttMessageToString())
 
 			// Create a RedisEntry from the MqttMessage
-			re := entities.CreateARedisEntryFromMqtt(mMqtt)
+			re := CreateARedisEntryFromMqtt(mMqtt)
 			//println("DEBUG : re.RedisEntryToString",re.RedisEntryToString())
 
 			// Create a RedisClient from the configuration

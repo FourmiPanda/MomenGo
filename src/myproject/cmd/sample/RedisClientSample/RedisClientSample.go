@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"myproject/cmd/redisMqtt"
 	"myproject/internal/entities"
 	"time"
 )
@@ -50,7 +49,7 @@ func main() {
 	println(r.CaptorKey())
 
 	// Create a RedisClient with the c
-	rc := redisMqtt.CreateARedisClientFromConfig(c)
+	rc := entities.CreateARedisClientFromConfig(c)
 
 	// Add the RedisEntry to the redis DB
 	_ = rc.AddCaptorEntryToDB(r)
