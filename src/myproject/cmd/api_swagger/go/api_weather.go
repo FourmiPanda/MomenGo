@@ -34,45 +34,28 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	iata := data.Get("iata")
-	if iata == "" {
-		iata = "*"
-	}
 	measureType := data.Get("type")
-	query := data.Get("query")
-	if measureType == "" {
-		measureType = "*"
-	}
+
 	moyenne := false
 	if data.Get("moyenne") == "" || data.Get("moyenne") == "true" {
 		moyenne = true
 	}
 
-	//TODO: Write the redis query
+	//TODO: Use the redis service
 
 	rc := entities.CreateARedisClientFromConfig(entities.GetConfig())
-	res, err := rc.Find(query)
-	if err != nil {
-		badRequest(w)
-		return
-	}
 
-	fmt.Println(res)
+	if measureType == "" && iata == "" {
+		rc.GetAllCaptorValuesOfPresForADay(time.Now())
+	}
 
 	if moyenne {
 
 	}
 
-	jsonRes := "["
-
-	for _, v := range res {
-		jsonRes += "{ \"type\" : \"" + v.Measure + "\"},"
-	}
-
-	jsonRes += "]"
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte(jsonRes))
+	_, _ = w.Write([]byte(""))
 
 }
 
