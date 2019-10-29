@@ -26,6 +26,9 @@ Set GOROOT and GOPATH :
 
 ### 3. Running
 1. Start BROKER MQTT : myproject/cmd/broker/initBroker.go
-2. Start REDIS Server : TODO
-3. Start CAPTORS Publiser : : myproject/cmd/capteur/main.go
-4. Start the REST API : : myproject/cmd/api/api.go
+2. Start REDIS Server : run redis_server.exe
+3. Start Redis captors subscriber : myproject/cmd/mqttToRedis/mqttToRedis.go
+4. Start CSV captors subscriber : myproject/cmd/csv/csv.go
+5. Start CAPTORS Publisers : myproject/cmd/capteur/main.go
+6. Start the REST API : myproject/cmd/api_swagger/main.go
+7. Start the web view : myproject/cmd/http_server/main.go
