@@ -1,0 +1,147 @@
+---
+swagger: "2.0"
+info:
+  description: "Get weather data of airports"
+  version: "1.0.0"
+  title: "MomenGo API"
+  termsOfService: "http://localhost/terms/"
+  contact:
+    email: "apiteam@momengo.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost"
+basePath: "/api"
+tags:
+- name: "Weather"
+  description: "Everything about weather"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "Captor"
+  description: "Information about captors"
+  externalDocs:
+    description: "Find out more about our captors"
+    url: "http://swagger.io"
+schemes:
+- "http"
+paths:
+  /search:
+    get:
+      tags:
+      - "Weather"
+      summary: "Returns a list of measure that match the search criteria."
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "search"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "start_date"
+        in: "query"
+        description: "Start date"
+        required: false
+        type: "string"
+        x-exportParamName: "StartDate"
+        x-optionalDataType: "String"
+      - name: "end_date"
+        in: "query"
+        description: "End date"
+        required: false
+        type: "string"
+        x-exportParamName: "EndDate"
+        x-optionalDataType: "String"
+      - name: "iata"
+        in: "query"
+        description: "IATA code"
+        required: false
+        type: "string"
+        x-exportParamName: "Iata"
+        x-optionalDataType: "String"
+      - name: "type"
+        in: "query"
+        description: "Type of measurement"
+        required: false
+        type: "string"
+        enum:
+        - "temperature"
+        - "pressure"
+        - "wind"
+        x-exportParamName: "Type_"
+        x-optionalDataType: "String"
+      - name: "moyenne"
+        in: "query"
+        description: "Get the average of measurement"
+        required: false
+        type: "boolean"
+        x-exportParamName: "Moyenne"
+        x-optionalDataType: "Bool"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Measure"
+        400:
+          description: "Bad Request"
+  /captors/{captorId}:
+    get:
+      tags:
+      - "Captor"
+      summary: "Find captor by ID"
+      description: "Returns a single captor"
+      operationId: "getCaptorById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "captorId"
+        in: "path"
+        description: "ID of captor to return"
+        required: true
+        type: "string"
+        x-exportParamName: "CaptorId"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Captor"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Captor not found"
+definitions:
+  Captor:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      IATA:
+        type: "string"
+      type:
+        type: "string"
+        enum:
+        - "temperature"
+        - "pressure"
+        - "wind"
+      QOS:
+        type: "integer"
+        format: "int64"
+    example:
+      QOS: 6
+      IATA: "IATA"
+      id: 0
+      type: "temperature"
+  Measure:
+    type: "object"
+    properties:
+      timestamp:
+        type: "string"
+      value:
+        type: "number"
+    example:
+      value: 0.80082819046101150206595775671303272247314453125
+      timestamp: "timestamp"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
