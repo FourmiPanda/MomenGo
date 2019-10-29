@@ -34,7 +34,7 @@ func main() {
 		json.Unmarshal([]byte(msg.Payload()), &c)
 		var tab = strings.Split(msg.Topic(), "/")
 		//csvLine := "\"" + tab[2] + "\",\"" + tab[3] + "\",\"" + c.Timestamp.String() + "\"," + fmt.Sprintf("%f", c.Value) + ";"
-		fmt.Println("Data received : ", csvLine)
+		//fmt.Println("Data received : ", csvLine)
 		writer.Write([]string{tab[2], tab[3], c.Timestamp.String(), fmt.Sprintf("%f", c.Value)})
 		writer.Flush()
 	})
@@ -46,7 +46,7 @@ func handleError(err error) {
 }
 
 func getConfig() entities.Configuration {
-	configPath, _ := filepath.Abs("../../../../src/config/config.json")
+	configPath, _ := filepath.Abs("src/config/config.json")
 	file, err := os.Open(configPath)
 	if err != nil {
 		handleError(err)
